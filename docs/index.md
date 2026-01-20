@@ -14,10 +14,9 @@ title: Vue d'ensemble du projet
 
 !!! info "Informations générales"
     **Session**: Hiver 2026  
-    **Auteur(s)**: <!-- Nom de chaque membre (matricule)  -->  
-    **Thème(s)**: <!-- Thèmes principaux abordés dans le projet  -->  
-    **Superviseur(s)**: <!-- Nom du superviseur (affiliation)  -->  
-    **Collaborateur(s):** <!-- Nom de(s) collaborateur(s) et partenaire(s)` -->  
+    **Auteur(s)**: Bilal Vandenberge  
+    **Thème(s)**: Web, Cache, HCI (UI/UX), Génie logiciel  
+    **Superviseur(s)**: Louis-Edouard Lafontant  
 
 ## Description du projet
 
@@ -48,7 +47,7 @@ title: Vue d'ensemble du projet
 
 ## Équipe
 
-> Présentez les membres de l’équipe et le rôle principal de chacun dans le projet.
+Bilal Vandenberge: Responsable de projet
 
 ## Échéancier
 
@@ -59,4 +58,12 @@ title: Vue d'ensemble du projet
 |--------------------------------|---------|---------|-------------------------------------|-------------|
 | Ouverture de projet            | 12 jan. | 12 jan. | Proposition de projet               | ✅ Terminé  |
 | Études préliminaires           | 12 jan. | 23 jan. | Document d'analyse                  | 🔄 En cours |
+| Analyse des exigences          | 20 jan. | 27 jan. | Spécifications de l'extension       | 🔄 En cours  |
+| Prototypage                    | 27 jan. | 10 fev. | Prototype v1                        | ⏳ À venir |
+| Évaluation 1                   | 16 fev. | 20 jan. | Feedback (rapport)                  | ⏳ À venir |
+| Sprint 1                       | 16 fev. | 9 mar. |  Extension v1                 | ⏳ À venir |
+| Évaluation 2                   | 9 mar. | 13 mar. | Feedback (rapport)                  | ⏳ À venir |
+| Sprint 2                       | 9 mar. | 30 mar. | Extension v2                  | ⏳ À venir |
+| Sprint 3 (peaufinement)        | 30 mar. | 17 avr. | Extension finale                  | ⏳ À venir |
+| Évaluation 3                   | 9 mar. | 13 mar. | Feedback (rapport)                  | ⏳ À venir |
 | Présentation + Rapport         | 17 avr. | 30 avr. | Présentation + Rapport              | ⏳ À venir  |

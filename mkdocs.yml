@@ -73,6 +73,7 @@ nav:
   - Vue d'ensemble: index.md
   - Suivi: suivi.md
   - Résumé: resume.md
+  - Exigences: features.md
   - Rapport:
     - Introduction: rapport/index.md
     - Études préliminaires: rapport/analyse.md

@@ -20,6 +20,8 @@ title: Résumé du projet
 
 > Présentez en un court texte cohérent : le contexte général, la problématique ou question centrale, la proposition retenue.
 
+
+
 ## Méthodologie et analyse
 
 > Résumez la démarche suivie pour analyser le problème et orienter la solution :
@@ -27,11 +29,17 @@ title: Résumé du projet
 >
 > Ne détaillez pas le suivi ni la planification fine.
 
+Squelette: Séléction et déséléction d'éléments, sauvegarde du style et du contenu des éléments
+Sondage utilisateur
+Produit: Tableau de bord, partie devlopeur, 
+
 ## Architecture et conception
 
 > Décrivez la structure générale de la solution et les principaux choix de conception.
 >
 > Restez au niveau conceptuel sans entrer dans les détails d’implémentation.
+
+
 
 ## Résultats et réalisations
 

@@ -12,45 +12,67 @@ title: Suivi du projet
 
 # Suivi de projet
 
-> :bulb: Cette page documente l’évolution du projet dans le temps.
+<!-- > :bulb: Cette page documente l’évolution du projet dans le temps.
 > Elle sert à rendre visibles les décisions, ajustements et apprentissages.
 > Les entrées peuvent être hebdomadaires ou bi-hebdomadaires.  
-> N'oubliez pas d’effacer ou de mettre en commentaires les notes (`>`) avant la remise finale.
+> N'oubliez pas d’effacer ou de mettre en commentaires les notes (`>`) avant la remise finale. -->
 
 ---
 
 ## Semaine 1 (12–18 janvier)
 
 ### Objectifs de la période
+
 - Clarifier la problématique
 - Explorer les solutions existantes
-- Produire un premier prototype conceptuel
 
 ### Travail réalisé
 
 !!! abstract "Avancement"
+    - [x] Choix de portabilité : Chrome
+        - Recherche dans la documentation Firefox & Chromium
     - [x] Analyse de solutions existantes
-        - Comparaison de trois outils similaires
-    - [x] Prototype basse fidélité (Figma)
-    - [ ] Validation utilisateur
-        - Reportée à la semaine suivante
+        - [Google Cache](https://addons.mozilla.org/fr/firefox/addon/google-cache/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search)
+        - [Textarea Cache](https://addons.mozilla.org/fr/firefox/addon/textarea-cache/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search)
+        - [DownThemAll](https://addons.mozilla.org/fr/firefox/addon/downthemall/)
+    - [x] Recherche sur la technologie PWA
 
 ### Décisions et ajustements
 
-> À compléter uniquement si des choix structurants ont été faits
-> ou si l’orientation du projet a évolué.
+<!-- > À compléter uniquement si des choix structurants ont été faits
+> ou si l’orientation du projet a évolué. -->
 
 !!! info "Décisions"
-    - Abandon de l’approche X jugée trop complexe
-    - Reformulation de la problématique suite aux premières analyses
+    - Choix du navigateur par défaut pour l'extension : Chrome (/ Chromium)
 
 ### Difficultés rencontrées
 
-> À compléter uniquement si des obstacles ont eu un impact réel
-> sur l’avancement du projet.
+<!-- > À compléter uniquement si des obstacles ont eu un impact réel
+> sur l’avancement du projet. -->
 
 !!! warning "Difficultés"
-    - Problème de configuration du plugin Mermaid
-        - Confusion entre `mkdocs-mermaid2-plugin` (pip)
-          et `mermaid2` (nom du plugin)
-        - Résolu après nettoyage et configuration correcte dans `mkdocs.yml`
+    - Limitations de la gestion du cache sur Firefox
+
+## Semaine 2 (19-26 janvier)
+
+### Objectifs de la période
+
+- Identifier les exigences
+- Produire la description détaillée du projet
+
+### Travail réalisé
+
+!!! abstract "Avancement"
+    - [x] Exigences
+        - Fonctionnalités
+        - Portabilité
+    - [ ] Renseignement sur le cache et le développement d'extension Chromium
+
+### Décisions et ajustements
+
+Voir la page des [fonctionnalités](./features.md)
+
+### Difficultés rencontrées
+
+Aucunes
+

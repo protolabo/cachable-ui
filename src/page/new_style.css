@@ -1,0 +1,6 @@
+/* --- PAGE --- */
+
+.page_element_hovered {
+  background-color: #b097fc87;
+  outline: #b097fc dashed 2px;
+}

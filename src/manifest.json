@@ -2,9 +2,24 @@
   "name": "Cachable UI",
   "description": "Gestion de cache avancée",
   "version": "0.1",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
   "manifest_version": 3,
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "popup/popup.html",
     "default_icon": "res/icon.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "page/script.js"
+      ],
+      "css": ["page/new_style.css"],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
 }

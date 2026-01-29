@@ -270,13 +270,13 @@
   
   
     <li class="md-tabs__item">
-      <a href="resume/" class="md-tabs__link">
+      <a href="features/" class="md-tabs__link">
         
   
   
     
   
-  Résumé
+  Exigences
 
       </a>
     </li>
@@ -289,13 +289,13 @@
   
   
     <li class="md-tabs__item">
-      <a href="features/" class="md-tabs__link">
+      <a href="resume/" class="md-tabs__link">
         
   
   
     
   
-  Exigences
+  Résumé
 
       </a>
     </li>
@@ -476,6 +476,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Proposition et objectifs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objectif-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectifs-specifiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectifs spécifiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -569,14 +597,14 @@
   
   
     <li class="md-nav__item">
-      <a href="resume/" class="md-nav__link">
+      <a href="features/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Résumé
+    Exigences
   
 
     
@@ -596,14 +624,14 @@
   
   
     <li class="md-nav__item">
-      <a href="features/" class="md-nav__link">
+      <a href="resume/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Exigences
+    Résumé
   
 
     
@@ -942,6 +970,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Proposition et objectifs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objectif-principal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif principal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectifs-specifiques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectifs spécifiques
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1030,31 +1086,138 @@
 <strong>Superviseur(s)</strong>: Louis-Edouard Lafontant  </p>
 </div>
 <h2 id="description-du-projet">Description du projet<a class="headerlink" href="#description-du-projet" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p><img alt="💡" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/png/1f4a1.png" title=":bulb:" /> N'oubliez pas d'effacer ou mettre en commentaires les notes (<code>&gt;</code>) en début de section</p>
-</blockquote>
+<!-- > :bulb: N'oubliez pas d'effacer ou mettre en commentaires les notes (`>`) en début de section -->
+
 <h3 id="contexte">Contexte<a class="headerlink" href="#contexte" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>Présentez le contexte général dans lequel s’inscrit votre projet (social, organisationnel, technologique, éducatif, environnemental, etc.).</p>
-</blockquote>
+<!-- > Présentez le contexte général dans lequel s’inscrit votre projet (social, organisationnel, technologique, éducatif, environnemental, etc.). -->
+
+<p>Sur les applications web le cache est une pièce très importante du puzzle qui forme la vitesse de chargement des pages de nos jours. Mais un point faible se présente : seul le développeur est responsable de la gestion du cache et la plupart du temps celle-ci est peu dévoilée à l'utilisateur. Afin d'avoir un meilleur contrôle et visibilité sur le cache de son navigateur, l'utilisateur pourra utiliser Cachable UI pour manuellement décider de quels éléments sur les pages qu'il visite, il juge utile à garder. Cela lui permet également d'accéder aux applications (en partie) hors-ligne.</p>
+<div class="admonition info">
+<p class="admonition-title">Version alternative</p>
+<p>Sur le Web moderne, la mise en cache joue un rôle central dans la performance, la fluidité et la disponibilité des applications. Toutefois, ces mécanismes restent largement invisibles et entièrement contrôlés par les développeurs, laissant peu de place à l’utilisateur pour comprendre ce qui est stocké localement ou pour décider de ce qu’il souhaite conserver pour un usage hors ligne.</p>
+<p>Dans des contextes de mobilité, de connectivité intermittente ou de consultation répétée de contenus (articles, recettes, documentation, consignes), ce manque de contrôle peut générer de la frustration et une perte de confiance. Le projet <em>Cachable UI</em> s’inscrit dans une perspective de <strong>conception centrée utilisateur</strong>, en proposant de rendre le cache web visible, manipulable et compréhensible à travers une extension de navigateur permettant de sélectionner explicitement des éléments d’une page à conserver localement.</p>
+</div>
 <h3 id="problematique">Problématique<a class="headerlink" href="#problematique" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>Décrivez le problème central ou la question de recherche que votre projet cherche à adresser, pourquoi s'y intéresser et les faiblesses des solutions actuelles. 
-Le problème doit pouvoir être compris indépendamment de la solution envisagée.</p>
-</blockquote>
+<!-- > Décrivez le problème central ou la question de recherche que votre projet cherche à adresser, pourquoi s'y intéresser et les faiblesses des solutions actuelles. 
+> Le problème doit pouvoir être compris indépendamment de la solution envisagée. -->
+
+<p>Trouver un compromis entre transparence et rapidité. En quoi une extension qui offre les pleins pouvoirs sur le cache web avec un degré de détails importants peut affecter l'expérience utilisateur et la confiance. Comment pouvons-nous également assurer tout cela tout en respectant la vie privée et propriété intellectuelle ?</p>
+<p>Actuellement, le cache web est entièrement sous le contrôle des développeurs. Ça le rend rapide et semble être une solution naturelle, car uniquement le développeur choisis de ce qu'il veut partager sur la machine du client. Mais qu'est-ce qu'il advient de la liberté de l'utilisateur ? Et si celui-ci souhaite comprendre et manuellement autoriser le contenu qui est stocké sur sa propre machine. Cette solution n'envisage absolument pas ce cas.</p>
+<div class="admonition info">
+<p class="admonition-title">Version alternative</p>
+<p>La mise en cache pose un dilemme classique entre <strong>performance</strong>, <strong>transparence</strong> et <strong>contrôle utilisateur</strong>. Les solutions actuelles privilégient la rapidité et la simplicité technique en confiant l’ensemble des décisions aux développeurs, au détriment de la compréhension et de l’autonomie de l’utilisateur final.</p>
+<p>Ce projet cherche à répondre aux questions suivantes :<br />
+- Comment exposer les mécanismes de cache sans surcharger l’interface ou nuire à l’expérience utilisateur ?<br />
+- En quoi le fait de donner un contrôle explicite sur le cache influence-t-il la confiance, la satisfaction et le sentiment d’autonomie ?<br />
+- Comment concilier ce contrôle avec les enjeux de vie privée, de sécurité et de propriété intellectuelle des contenus ?</p>
+</div>
 <h3 id="proposition-et-objectifs">Proposition et objectifs<a class="headerlink" href="#proposition-et-objectifs" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>Présentez votre proposition de projet et les objectifs visés. Expliquez en quoi votre approche répond à la problématique identifiée. 
-Assurez-vous d'avoir, dans la mesure du possible, des objectifs mesurables, raisonnnables dans le temps et non redondants entre eux.</p>
-</blockquote>
+<!-- > Présentez votre proposition de projet et les objectifs visés. Expliquez en quoi votre approche répond à la problématique identifiée. 
+> Assurez-vous d'avoir, dans la mesure du possible, des objectifs mesurables, raisonnnables dans le temps et non redondants entre eux. -->
+
+<ol>
+<li>
+<p>Réaliser une extension qui permet la sélection et désélection de certains éléments des pages web afin de les placer entièrement dans le cache. Ceux-ci doivent rester accessibles même hors connexion. On doit donc :
+    1.1 Sauvegarder les ressources. (images, vidéos, fichiers externes, ...)
+    1.2 Sauvegarder le style, la position et le contenu de l'élément
+    1.3 Sauvegarder le scripting (JavaScript) de l'élément
+    1.4 Gérer le contenu dynamique et les changements en cas de multiples visites sur un site dont le contenu peut changer souvent</p>
+</li>
+<li>
+<p>Réaliser une partie développeur en HTML (ou react) qui permet au développeur d'apporter des annotations/protections sur leur application à l'égard de l'application. Cela permet :
+    2.1 Pour la protection de la vie privée et de la propriété intellectuelle, d'empêcher le téléchargement de certains contenus et éléments
+    2.2 De faciliter l'intégration de l'extension dans les pages complexes, en JavaScript</p>
+</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">Version alternative</p>
+<p>Le projet propose de développer une <strong>extension de navigateur expérimentale</strong> permettant à l’utilisateur de sélectionner et de gérer des éléments de pages web à conserver hors ligne.</p>
+<h4 id="objectif-principal">Objectif principal<a class="headerlink" href="#objectif-principal" title="Permanent link">&para;</a></h4>
+<p>Concevoir et évaluer une interface utilisable qui rend la mise en cache explicite et contrôlable par l’utilisateur, tout en respectant les contraintes du web.</p>
+<h4 id="objectifs-specifiques">Objectifs spécifiques<a class="headerlink" href="#objectifs-specifiques" title="Permanent link">&para;</a></h4>
+<ol>
+<li>
+<p>Développer une extension permettant :</p>
+<ul>
+<li>la sélection et la désélection visuelle d’éléments HTML ;</li>
+<li>la sauvegarde locale du contenu statique (HTML, CSS, images associées) ;</li>
+<li>la restitution fidèle de ces éléments en mode hors ligne.</li>
+</ul>
+</li>
+<li>
+<p>Explorer la gestion du contenu dynamique :</p>
+<ul>
+<li>identifier les limites de la mise en cache d’éléments dynamiques ;</li>
+<li>proposer des stratégies simples de mise à jour (ex. : revalidation manuelle ou automatique).</li>
+</ul>
+</li>
+<li>
+<p>Proposer un mécanisme côté développeur (balisage ou annotations HTML) permettant :</p>
+<ul>
+<li>de restreindre ou interdire la mise en cache de certains éléments ;</li>
+<li>de faciliter l’intégration de l’extension dans des applications complexes.</li>
+</ul>
+</li>
+</ol>
+<p>Les fonctionnalités avancées (scripts complexes, animations, vidéos interactives) seront considérées comme <strong>exploratoires</strong> et traitées selon le temps disponible.</p>
+</div>
 <h3 id="methodologie">Méthodologie<a class="headerlink" href="#methodologie" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>Expliquez comment vous comptez aborder le projet : démarche générale, grandes étapes prévues, itérations, types de validations envisagées.</p>
-</blockquote>
+<!-- > Expliquez comment vous comptez aborder le projet : démarche générale, grandes étapes prévues, itérations, types de validations envisagées. -->
+
+<ul>
+<li>
+<p>Étape 0: Réaliser un squelette de l'extension caractérisé par:</p>
+<ul>
+<li>Aucun tableau de bord</li>
+<li>Uniques fonctionnalités: sélection et désélection d'éléments</li>
+</ul>
+</li>
+<li>
+<p>Étape 1: Réaliser la première itération - sauvegarde du style</p>
+<ul>
+<li>Faire en sorte que l'élément sauvegarder garde sa position et son style identique à sa version en ligne</li>
+</ul>
+</li>
+<li>
+<p>Étape 2: Réaliser la deuxième itération - sauvegarde de contenu dynamique</p>
+<ul>
+<li>Gérer le changement du contenu de l'application</li>
+<li>Gérer le JavaScript derrière les éléments sauvegardés</li>
+<li>Permettre à l'utilisateur de définir ses paramètres quant à la mise à jour des éléments en cas de nouvelle visite</li>
+</ul>
+</li>
+<li>
+<p>Étape 3: Réaliser la troisième itération - Balisage HTML (ou react)</p>
+<ul>
+<li>Du balisage pour bloquer la mise en cache de certains éléments</li>
+<li>...</li>
+</ul>
+</li>
+<li>
+<p>Étape 4: Peaufinage + Tableau de bord + Popup</p>
+<ul>
+<li>Popup: Permet la sélection, désélection, désactivation de l'extension sur la page actuelle</li>
+<li>Tableau de bord: Liste et nombre de sites et éléments affectés par l'extension, contrôle global</li>
+<li>Ajout de tests unitaires et débogage</li>
+</ul>
+</li>
+<li>
+<p>Étape 5: Évalutation utilisateur</p>
+<ul>
+<li>Sondage</li>
+<li>Rapport</li>
+</ul>
+</li>
+</ul>
 <h3 id="validation-et-evaluation">Validation et Évaluation<a class="headerlink" href="#validation-et-evaluation" title="Permanent link">&para;</a></h3>
-<blockquote>
-<p>Indiquez comment vous évaluerez que votre solution répond aux objectifs du projet (ex. scénarios d’usage, tests, retours utilisateurs, indicateurs qualitatifs ou quantitatifs).</p>
-</blockquote>
+<!-- > Indiquez comment vous évaluerez que votre solution répond aux objectifs du projet (ex. scénarios d’usage, tests, retours utilisateurs, indicateurs qualitatifs ou quantitatifs). -->
+
+<p>Via trois méthodes d'évaluation:</p>
+<ul>
+<li>Comparaison avec une autre extension: DownThemAll!</li>
+<li>Tests unitaires pour la partie utilisateur et dévloppeur</li>
+<li>2 Sondages utilisateurs (voir Échéancier) pour évaluer l'UX et l'impact</li>
+</ul>
 <h2 id="equipe">Équipe<a class="headerlink" href="#equipe" title="Permanent link">&para;</a></h2>
 <p>Bilal Vandenberge: Responsable de projet</p>
 <h2 id="echeancier">Échéancier<a class="headerlink" href="#echeancier" title="Permanent link">&para;</a></h2>

@@ -15,10 +15,10 @@
         <link rel="canonical" href="https://ift3150-template.github.io/features/">
       
       
-        <link rel="prev" href="../resume/">
+        <link rel="prev" href="../suivi/">
       
       
-        <link rel="next" href="../rapport/">
+        <link rel="next" href="../resume/">
       
       
         
@@ -268,25 +268,6 @@
   
   
   
-  
-    <li class="md-tabs__item">
-      <a href="../resume/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  Résumé
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
     
   
   
@@ -298,6 +279,25 @@
     
   
   Exigences
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../resume/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Résumé
 
       </a>
     </li>
@@ -427,6 +427,113 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exigences
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exigences
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#exigences-fonctionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exigences fonctionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exigences-non-fonctionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exigences non fonctionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagramme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagramme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     <li class="md-nav__item">
@@ -446,43 +553,6 @@
   
 
       </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exigences
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
     </li>
   
 
@@ -764,6 +834,47 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#exigences-fonctionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exigences fonctionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exigences-non-fonctionnelles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exigences non fonctionnelles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagramme" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagramme
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -791,6 +902,35 @@
 </style>
 
 <h1 id="exigences">Exigences<a class="headerlink" href="#exigences" title="Permanent link">&para;</a></h1>
+<h2 id="exigences-fonctionnelles">Exigences fonctionnelles<a class="headerlink" href="#exigences-fonctionnelles" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p><strong>Gérer les éléments mis en cache</strong>: Les utilisateurs sont capables de sélectionner/désélectionner/modifier les éléments des pages web qui sont sauvegarder dans leur cache. Ceux-ci doivent rester accessible de façon standalone même hors-connexion (position, style, contenu, fichiers, scripts).</p>
+</li>
+<li>
+<p><strong>Accèder aux pages hors-connexion</strong>: L'extension détecte si la connexion est activée. Si oui, le cache charge les fichiers et scripts qui sont déjà téléchargés et gérer tout contenu dynamique (changement du layout, contenu de page, etc.). Si non, les éléments sauvegardés s'affiche de façon standalone et le reste de la page doit rester vide.</p>
+</li>
+<li>
+<p><strong>Gérer les pages mis en cache</strong>: Via le tableau de bord, les utilisateurs peuvent modifier/supprimer/lire les pages qui sont affectés par l'extension.</p>
+</li>
+<li>
+<p><strong>Ajout de balises dans les éléments HTML</strong>: Les développeurs qui souhaite indiquer des préférences à l'extension peuvent le faire via les balises data-*. L'extension les prend en compte.</p>
+<ul>
+<li>data-cachableui-forbidden: Flag indiquant que l'élément ne peut pas être sauvegardé.</li>
+<li>data-cachableui-auto:    Flag indiquant que l'élément doit être automatiquement sauvegardé.</li>
+<li>data-cachableui-sensibleinput: Flag indiquant que l'input visé est sensible et ne doit pas sauvegarder son contenu (ex: Les champs de mot de passe)</li>
+</ul>
+</li>
+</ul>
+<h2 id="exigences-non-fonctionnelles">Exigences non fonctionnelles<a class="headerlink" href="#exigences-non-fonctionnelles" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Temps de réponse</strong>: Chaque entrée utilisateur (sauf chargement de lourds fichiers) doit être répondue en moins de 1000ms</li>
+<li><strong>Sécurité</strong>: L'extension ne doit pas partager les données utilisateurs et les caches, ceux-ci doivent rester sur la machine cliente et ne sort pas de celle-ci.</li>
+<li><strong>Portabilité</strong>: L'extension est compatible avec le navigateur Chrome 145.0.7632.19</li>
+<li><strong>Compatibilité</strong>: L'extension est compatible avec les ordinateurs</li>
+</ul>
+<h2 id="diagramme">Diagramme<a class="headerlink" href="#diagramme" title="Permanent link">&para;</a></h2>
+<p><img alt="usecase" src="../res/usecase.png" /></p>
 
 
 

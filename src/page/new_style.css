@@ -4,3 +4,20 @@
   background-color: #b097fc87;
   outline: #b097fc dashed 2px;
 }
+
+.body_selection_mode {
+  outline: #b097fc solid 2px;
+}
+
+.cachableui_overlay {
+  position: fixed;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -5%);
+  color: white;
+  background-color: #59478f;
+  z-index: 1000;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 50vh;
+}

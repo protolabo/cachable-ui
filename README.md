@@ -1,4 +1,4 @@
-# Template de site web pour IFT3150 (Projet informatique)
+# IFT3150 (Projet informatique) - Cachable UI
 
 Ce répertoire contient un template de site web de projet pour le cours IFT3150, construit avec [MkDocs](https://www.mkdocs.org/) et le thème [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
 

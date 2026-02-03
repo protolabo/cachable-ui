@@ -21,10 +21,34 @@ chrome.runtime.onMessage.addListener(
 );
 
 function add_selection_popup() {
-  const overlay = document.createElement('i_cachableui_overlay');
-  overlay.textContent = 'YOU ARE IN EDITOR MODE';
+  const overlay = document.createElement('t_cachableui_overlay');
   overlay.classList.add('cachableui_overlay');
   overlay.id = 'i_cachableui_overlay';
+
+  const overlay_text = document.createElement('span');
+  overlay_text.textContent = 'YOU ARE IN EDITOR MODE';
+  overlay_text.classList.add('cachableui_overlay_text');
+  overlay_text.id = 'i_cachableui_overlay_text';
+
+  const overlay_btn = document.createElement('button');
+  overlay_btn.innerHTML = '<svg class="mdi_icon" id="i_cachableui_delicon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><title>close-thick</title><path d="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z" /></svg>';
+  overlay_btn.classList.add('cachableui_overlay_button');
+  overlay_btn.id = 'i_cachableui_overlay_button';
+  overlay_btn.addEventListener(
+    "click", () => {
+      remove_selection_popup();
+      is_selection_active = false;
+    }
+  )
+
+  const overlay_content = document.createElement('div');
+  overlay_content.classList.add('cachableui_overlay_content');
+  overlay_content.id = 'i_cachableui_overlay_content';
+
+  overlay_content.appendChild(overlay_text);
+  overlay_content.appendChild(overlay_btn);
+  overlay.appendChild(overlay_content);
+
   document.body.insertBefore(overlay, document.body.firstChild);
 }
 
@@ -33,7 +57,7 @@ function remove_selection_popup() {
 }
 
 window.onmouseover = function (event) {
-  if (is_selection_active) {
+  if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.target.classList.add("page_element_hovered");
   }
 };

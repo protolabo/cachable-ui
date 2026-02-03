@@ -86,11 +86,11 @@ window.onclick = function (event) {
 element_default_id = 1
 
 function add_element_to_storage(element) {
-  const json_id = "element_" + String(element_default_id);
+  const json_id = element.tagName + "_" + String(element_default_id);
   console.log(element.id);
   if (typeof (element) == HTMLElement && typeof (element.id) == string) {
     json_id = element.id;
-  } else {
+  } else if (false /*todo*/) { } else {
     element_default_id++;
   }
 
@@ -99,11 +99,6 @@ function add_element_to_storage(element) {
     id: json_id,
     content: element_as_string
   };
-
-  // TEMP
-  // chrome.storage.local.clear(() => {
-  //   console.log("[CachableUI] All elements removed from cache");
-  // });
 
   chrome.storage.local.set({ [json_id]: data_to_save }, function () {
     console.log("[CachableUI] Save to database: " + json_id);

@@ -1,4 +1,22 @@
 const editor_checkbox = document.getElementById('editor_checkbox')
+const domain_title = document.getElementById("domain_title");
+const clear_button = document.getElementById("clear_button");
+const clear_icon = document.getElementById("clear_svg_icon");
+let current_domain = "blank";
+let current_url = "blank";
+
+editor_checkbox.addEventListener('change', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { selection_mode: (editor_checkbox.checked ? "active" : "inactive") }, (response) => {
+    });
+  });
+});
+
+clear_button.addEventListener('click', () => {
+  chrome.storage.local.clear(() => {
+    console.log("[CachableUI] All elements removed from cache");
+  });
+});
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   chrome.tabs.sendMessage(tabs[0].id, { selection_mode: "ask" }, (response) => {
@@ -26,7 +44,6 @@ chrome.storage.onChanged.addListener(async (changes, area_name) => {
 function update_elements_list(storage) {
   let ui_list = document.getElementById("elements_list");
   ui_list.replaceChildren(); // Clear
-  console.log("hellp");
   Object.entries(storage).forEach(([key, value]) => {
     console.log("Adding tile for " + key);
 
@@ -35,6 +52,21 @@ function update_elements_list(storage) {
     child.innerHTML = gen_html_for_tile(value);
     ui_list.appendChild(child);
   });
+  if (ui_list.childElementCount == 0) {
+    let no_child_label = document.createElement("span");
+    no_child_label.textContent = "aucun élément dans le cache";
+    no_child_label.classList.add("no_child_label");
+    ui_list.appendChild(no_child_label);
+    clear_button.classList.remove("visible");
+    clear_button.classList.add("not_visible");
+    clear_icon.classList.remove("visible");
+    clear_icon.classList.add("not_visible");
+  } else {
+    clear_button.classList.remove("not_visible");
+    clear_button.classList.add("visible");
+    clear_icon.classList.remove("not_visible");
+    clear_icon.classList.add("visible");
+  }
 }
 
 function gen_html_for_tile(json) {
@@ -57,9 +89,22 @@ function gen_html_for_tile(json) {
       </button>`
 }
 
-editor_checkbox.addEventListener('change', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { selection_mode: (editor_checkbox.checked ? "active" : "inactive") }, (response) => {
-    });
-  });
+async function getCurrentDomain() {
+  let queryOptions = { active: true, currentWindow: true };
+  let [tab] = await chrome.tabs.query(queryOptions);
+  const url = tab.url;
+  if (url) {
+    try {
+      const urlObject = new URL(url);
+      return urlObject.hostname;
+    } catch (e) {
+      console.error("Invalid URL:", e);
+      return null;
+    }
+  }
+  return null, null;
+}
+getCurrentDomain().then((domain) => {
+  current_domain = domain;
+  domain_title.textContent = current_domain;
 });

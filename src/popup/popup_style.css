@@ -3,6 +3,7 @@
 body {
   /* height: 300px; */
   width: 200px;
+  min-height: 200px;
   background-color: #141020;
 
   display: flex;
@@ -159,4 +160,91 @@ input:checked+.slider:before {
 
 .del_icon:hover {
   fill: #ffb7b7b4;
+}
+
+/* From Uiverse.io by vinodjangid07 */ 
+#clear_button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #b097fc30;
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  margin-top: 16px;
+  transition-duration: .3s;
+}
+
+.clear_svg_icon {
+  width: 12px;
+  transition-duration: .3s;
+}
+
+.clear_svg_icon path {
+  fill: white;
+  transition-duration: .3s;
+}
+
+#clear_button:hover {
+  width: 140px;
+  border-radius: 50px;
+  transition-duration: .3s;
+  background-color: rgb(255, 69, 69);
+  align-items: center;
+}
+
+#clear_button:hover .clear_svg_icon {
+  width: 50px;
+  transition-duration: .3s;
+  transform: translateY(55%);
+}
+
+#clear_button::before {
+  position: absolute;
+  top: -20px;
+  content: "Clear cache";
+  color: white;
+  transition-duration: .3s;
+  font-size: 2px;
+}
+
+#clear_button:hover::before {
+  font-size: 13px;
+  opacity: 1;
+  transform: translateY(25px);
+  transition-duration: .3s;
+}
+/**/
+
+#domain_title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+.no_child_label {
+  color: #fff;
+  font-size: 12px;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding-top: 32px;
+  padding-bottom: 32px;
+  display: flex;
+}
+
+.visible {
+  visibility: visible;
+}
+
+.not_visible {
+  visibility: hidden;
 }

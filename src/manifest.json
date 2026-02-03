@@ -15,6 +15,7 @@
   "content_scripts": [
     {
       "js": [
+        "libs/domJSON.js",
         "page/script.js"
       ],
       "css": ["page/new_style.css"],

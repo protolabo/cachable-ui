@@ -1,0 +1,152 @@
+{
+    "meta": {
+        "href": "https://search.nixos.org/packages?channel=25.11&query=discord",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+        "version": "0.1.2",
+        "clock": 3,
+        "date": "2026-02-03T16:39:31.885Z",
+        "dimensions": {
+            "inner": {
+                "x": 1365,
+                "y": 961
+            },
+            "outer": {
+                "x": 1920,
+                "y": 1048
+            }
+        },
+        "options": {
+            "absolutePaths": [
+                "action",
+                "data",
+                "href",
+                "src"
+            ],
+            "attributes": true,
+            "computedStyle": false,
+            "cull": true,
+            "deep": true,
+            "domProperties": [
+                true,
+                "attributes",
+                "childNodes",
+                "children",
+                "classList",
+                "dataset",
+                "style",
+                "innerHTML",
+                "innerText",
+                "outerHTML",
+                "outerText",
+                "prefix",
+                "text",
+                "textContent",
+                "wholeText"
+            ],
+            "filter": false,
+            "htmlOnly": false,
+            "metadata": true,
+            "serialProperties": false,
+            "stringify": false,
+            "allowDangerousElements": false,
+            "absoluteBase": "https://search.nixos.org/"
+        }
+    },
+    "node": {
+        "translate": true,
+        "hidden": false,
+        "inert": false,
+        "draggable": false,
+        "spellcheck": true,
+        "contentEditable": "inherit",
+        "isContentEditable": false,
+        "offsetTop": 51,
+        "offsetLeft": 90,
+        "offsetWidth": 1170,
+        "offsetHeight": 51,
+        "writingSuggestions": "true",
+        "autofocus": false,
+        "tabIndex": -1,
+        "namespaceURI": "http://www.w3.org/1999/xhtml",
+        "localName": "h1",
+        "tagName": "H1",
+        "className": "page_element_hovered",
+        "scrollTop": 0,
+        "scrollLeft": 0,
+        "scrollWidth": 1170,
+        "scrollHeight": 67,
+        "clientTop": 0,
+        "clientLeft": 0,
+        "clientWidth": 1170,
+        "clientHeight": 51,
+        "childElementCount": 1,
+        "currentCSSZoom": 1,
+        "nodeType": 1,
+        "nodeName": "H1",
+        "baseURI": "https://search.nixos.org/packages?channel=25.11&query=discord",
+        "isConnected": true,
+        "attributes": {
+            "class": "page_element_hovered"
+        },
+        "childNodes": [
+            {
+                "data": "Search more than ",
+                "length": 17,
+                "nodeType": 3,
+                "nodeName": "#text",
+                "baseURI": "https://search.nixos.org/packages?channel=25.11&query=discord",
+                "isConnected": true,
+                "nodeValue": "Search more than ",
+                "childNodes": []
+            },
+            {
+                "translate": true,
+                "hidden": false,
+                "inert": false,
+                "draggable": false,
+                "spellcheck": true,
+                "contentEditable": "inherit",
+                "isContentEditable": false,
+                "offsetTop": 64,
+                "offsetLeft": 406,
+                "offsetWidth": 272,
+                "offsetHeight": 36,
+                "writingSuggestions": "true",
+                "autofocus": false,
+                "tabIndex": -1,
+                "namespaceURI": "http://www.w3.org/1999/xhtml",
+                "localName": "strong",
+                "tagName": "STRONG",
+                "scrollTop": 0,
+                "scrollLeft": 0,
+                "scrollWidth": 0,
+                "scrollHeight": 0,
+                "clientTop": 0,
+                "clientLeft": 0,
+                "clientWidth": 0,
+                "clientHeight": 0,
+                "childElementCount": 0,
+                "currentCSSZoom": 1,
+                "nodeType": 1,
+                "nodeName": "STRONG",
+                "baseURI": "https://search.nixos.org/packages?channel=25.11&query=discord",
+                "isConnected": true,
+                "attributes": {
+                    "class": ""
+                },
+                "childNodes": [
+                    {
+                        "data": "120 000 packages",
+                        "length": 16,
+                        "nodeType": 3,
+                        "nodeName": "#text",
+                        "baseURI": "https://search.nixos.org/packages?channel=25.11&query=discord",
+                        "isConnected": true,
+                        "nodeValue": "120 000 packages",
+                        "childNodes": []
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -100,7 +100,11 @@ function add_element_to_storage(element) {
     content: element_as_string
   };
 
-  chrome.storage.local.set({ [json_id]: data_to_save }, function () {
+  chrome.storage.local.get([document.URL], (result) => {
+  let current_cache = result[document.URL] || {};
+  current_cache[json_id] = data_to_save;
+  chrome.storage.local.set({ [document.URL]: current_cache }, () => {
     console.log("[CachableUI] Save to database: " + json_id);
   });
+});
 }

@@ -1,9 +1,13 @@
 const editor_checkbox = document.getElementById('editor_checkbox')
-const domain_title = document.getElementById("domain_title");
+const tab_title = document.getElementById("tab_title");
+const tab_favicon = document.getElementById("tab_favicon");
 const clear_button = document.getElementById("clear_button");
 const clear_icon = document.getElementById("clear_svg_icon");
+
 let current_domain = "blank";
 let current_url = "blank";
+let current_title = "blank";
+let current_favicon = "blank";
 
 editor_checkbox.addEventListener('change', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -44,7 +48,7 @@ chrome.storage.onChanged.addListener(async (changes, area_name) => {
 function update_elements_list(storage) {
   let ui_list = document.getElementById("elements_list");
   ui_list.replaceChildren(); // Clear
-  Object.entries(storage).forEach(([key, value]) => {
+  Object.entries(storage[current_url]).forEach(([key, value]) => {
     console.log("Adding tile for " + key);
 
     let child = document.createElement("div");
@@ -89,22 +93,30 @@ function gen_html_for_tile(json) {
       </button>`
 }
 
-async function getCurrentDomain() {
-  let queryOptions = { active: true, currentWindow: true };
-  let [tab] = await chrome.tabs.query(queryOptions);
-  const url = tab.url;
-  if (url) {
-    try {
-      const urlObject = new URL(url);
-      return urlObject.hostname;
-    } catch (e) {
-      console.error("Invalid URL:", e);
-      return null;
-    }
-  }
-  return null, null;
+async function get_current_tab_info(on_complete) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    var activeTab = tabs[0];
+    var title = activeTab.title;
+    var favicon_url = activeTab.favIconUrl;
+    const url = activeTab.url;
+    var domain = (new URL(url)).hostname;
+
+    on_complete(title, favicon_url, domain, url);
+  });
 }
-getCurrentDomain().then((domain) => {
+
+get_current_tab_info((title, icon, domain, url) => {
+  console.log(title, icon, domain, url)
+  current_title = title;
+  current_favicon = icon;
   current_domain = domain;
-  domain_title.textContent = current_domain;
+  current_url = url;
+
+  tab_title.textContent = current_title;
+  tab_favicon.src = current_favicon;
 });
+
+// get_current_tab_info().then((domain) => {
+//   current_domain = domain;
+//   domain_title.textContent = current_domain;
+// });

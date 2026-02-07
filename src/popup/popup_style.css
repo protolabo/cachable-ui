@@ -162,7 +162,7 @@ input:checked+.slider:before {
   fill: #ffb7b7b4;
 }
 
-/* From Uiverse.io by vinodjangid07 */ 
+/* From Uiverse.io by vinodjangid07 */
 #clear_button {
   width: 40px;
   height: 40px;
@@ -220,13 +220,36 @@ input:checked+.slider:before {
   transform: translateY(25px);
   transition-duration: .3s;
 }
+
 /**/
 
-#domain_title {
-  color: #fff;
+#tab_div {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  gap: 8px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+#tab_favicon {
+  height: 14px;
+}
+
+#tab_title {
+  color: #ffffffbb;
   font-size: 14px;
   font-weight: bold;
-  margin-top: 0;
+  overflow: hidden;
+  max-lines: 1;
+  text-overflow: ellipsis;
 }
 
 .no_child_label {

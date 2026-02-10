@@ -5,6 +5,11 @@
   outline: #b097fc dashed 2px;
 }
 
+.page_element_saved {
+  background-color: #97fce187;
+  outline: #6ef3b1 dashed 2px;
+}
+
 .body_selection_mode {
   outline: #b097fc solid 2px;
 }

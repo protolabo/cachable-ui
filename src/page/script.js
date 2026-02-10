@@ -77,6 +77,7 @@ window.onmouseout = function (event) {
 window.onclick = function (event) {
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
+    event.target.classList.add("page_element_saved");
     add_element_to_storage(event.target);
   }
 };

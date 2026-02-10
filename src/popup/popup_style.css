@@ -240,7 +240,7 @@ input:checked+.slider:before {
 }
 
 #tab_favicon {
-  height: 14px;
+  height: 18px;
 }
 
 #tab_title {
@@ -262,12 +262,4 @@ input:checked+.slider:before {
   padding-top: 32px;
   padding-bottom: 32px;
   display: flex;
-}
-
-.visible {
-  visibility: visible;
-}
-
-.not_visible {
-  visibility: hidden;
 }

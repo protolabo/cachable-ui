@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline page</title>
 </head>
+
 <body>
-    <h1>
+    <h1 id="element_title">
         View saved element: ELEMENT_ID
     </h1>
-    <div id="element_preview">
+    <h2 id="url_title">
+        For page: URL
+    </h2>
 
-    </div>
+    <div id="element_json"></div>
+    <div id="element_preview"></div>
+
+    <script src="../libs/domJSON.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>

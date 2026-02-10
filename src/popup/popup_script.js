@@ -60,6 +60,9 @@ function update_elements_list(storage) {
       document.getElementById("erase_elem_" + value.id).addEventListener("click", () => {
         erase_from_storage(value.id);
       })
+      document.getElementById("view_elem_" + value.id).addEventListener("click", () => {
+        view_element(value.id);
+      })
     });
   }
   if (ui_list.childElementCount == 0) {
@@ -75,7 +78,7 @@ function update_elements_list(storage) {
 
 function gen_html_for_tile(json) {
   return `<span class="element_txt">${json.id}</span>
-      <button class="element_btn">
+      <button class="element_btn" id="view_elem_${json.id}">
         <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
           width="16" height="16">
           <title>view</title>
@@ -132,5 +135,15 @@ function erase_from_storage(element) {
         console.log('Element removed from cache');
       });
     }
+  });
+}
+
+function view_element(element) {
+  const params = new URLSearchParams();
+  params.append("url", current_url);
+  params.append("element", element);
+
+  chrome.tabs.create({
+    url: `offline_page/page.html?${params.toString()}`
   });
 }

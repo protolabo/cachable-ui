@@ -1,8 +1,4 @@
-// Libraries
-
 // import domJSON from 'domjson';
-
-// 
 
 is_selection_active = false;
 
@@ -77,9 +73,12 @@ window.onmouseout = function (event) {
 window.onclick = function (event) {
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
-    event.target.classList.add("page_element_saved");
+    event.target.classList.remove("page_element_hovered");
     add_element_to_storage(event.target);
+    event.target.classList.add("page_element_saved");
+
   }
+  return false;
 };
 
 // IO OPERATIONS
@@ -87,7 +86,9 @@ window.onclick = function (event) {
 element_default_id = 1
 
 function add_element_to_storage(element) {
-  const json_id = element.tagName + "_" + String(element_default_id);
+  const rect_elem = element.getBoundingClientRect();
+
+  let json_id = element.tagName + "_" + String(element_default_id);
   console.log(element.id);
   if (typeof (element) == HTMLElement && typeof (element.id) == string) {
     json_id = element.id;
@@ -100,7 +101,9 @@ function add_element_to_storage(element) {
   });
   const data_to_save = {
     id: json_id,
-    content: element_as_string
+    content: element_as_string,
+    top: rect_elem.top,
+    left: rect_elem.left,
   };
 
   chrome.storage.local.get([document.URL], (result) => {
@@ -110,4 +113,18 @@ function add_element_to_storage(element) {
       console.log("[CachableUI] Save to database: " + json_id);
     });
   });
+
+  // Take a screenshot and save it to the DB (remove overlay)
+  if (document.body.firstChild.id === "i_cachableui_overlay") {
+    document.body.firstChild.style.visibility = "hidden";
+  }
+  html2canvas(document.body).then(async canvas => {
+    const dataUrl = canvas.toDataURL("image/png");
+    await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: json_id});
+  }).catch((e) => {
+    console.log("Html2Canvas error", e);
+  });
+  if (document.body.firstChild.id === "i_cachableui_overlay") {
+    document.body.firstChild.style.visibility = "show";
+  }
 }

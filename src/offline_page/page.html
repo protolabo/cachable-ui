@@ -5,19 +5,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline page</title>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #whole {
+            width: 100vw;
+            height: 100vh;
+            margin: 0%;
+
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        #preview_container {
+            width: 100vw;
+            height: 100vh;
+            backdrop-filter: blur(10px);
+        }
+
+        #element_preview {
+            position: absolute;
+        }
+    </style>
 </head>
 
 <body>
-    <h1 id="element_title">
-        View saved element: ELEMENT_ID
-    </h1>
-    <h2 id="url_title">
-        For page: URL
-    </h2>
-
-    <div id="element_json"></div>
-    <div id="element_preview"></div>
-
+    <div id="whole">
+        <div id = "preview_container"></div>
+    </div>
     <script src="../libs/domJSON.js"></script>
     <script src="script.js"></script>
 </body>

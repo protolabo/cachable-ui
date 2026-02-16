@@ -6,20 +6,27 @@
     "activeTab",
     "scripting",
     "storage",
-    "tabs"
+    "tabs",
+    "downloads"
   ],
   "manifest_version": 3,
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": "res/icon.png"
   },
+  "background": {
+    "service_worker": "page/background.js"
+  },
   "content_scripts": [
     {
       "js": [
         "libs/domJSON.js",
+        "libs/html2Canvas.min.js",
         "page/script.js"
       ],
-      "css": ["page/new_style.css"],
+      "css": [
+        "page/new_style.css"
+      ],
       "matches": [
         "<all_urls>"
       ]

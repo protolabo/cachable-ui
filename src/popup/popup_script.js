@@ -17,6 +17,7 @@ editor_checkbox.addEventListener('change', () => {
 });
 
 clear_button.addEventListener('click', () => {
+  chrome.runtime.sendMessage({type: "CLEAR_ALL"});
   chrome.storage.local.remove(current_url, () => {
     console.log("[CachableUI] All elements removed from cache");
   });

@@ -101,16 +101,16 @@ Bilal Vandenberge: Responsable de projet
 !!! info
     Le suivi complet est disponible dans la page [Suivi de projet](suivi.md).
 
-| Activités                      | Début   |   Fin   | Livrable                            | Statut      |
-|--------------------------------|---------|---------|-------------------------------------|-------------|
-| Ouverture de projet            | 12 jan. | 12 jan. | Proposition de projet               | ✅ Terminé  |
-| Études préliminaires           | 12 jan. | 23 jan. | Document d'analyse                  | 🔄 En cours |
-| Analyse des exigences          | 20 jan. | 27 jan. | Spécifications de l'extension       | 🔄 En cours |
-| Prototypage                    | 27 jan. | 10 fev. | Prototype v1                        | ⏳ À venir  |
-| Évaluation 1                   | 16 fev. | 20 jan. | Feedback (rapport)                  | ⏳ À venir  |
-| Sprint 1                       | 16 fev. | 9 mar.  |  Extension v1                       | ⏳ À venir  |
-| Évaluation 2                   | 9 mar. | 13 mar.  | Feedback (rapport)                  | ⏳ À venir  |
-| Sprint 2                       | 9 mar. | 30 mar.  | Extension v2                        | ⏳ À venir  |
-| Sprint 3 (peaufinement)        | 30 mar. | 17 avr. | Extension finale                    | ⏳ À venir  |
-| Évaluation 3                   | 9 mar. | 13 mar.  | Feedback (rapport)                  | ⏳ À venir  |
-| Présentation + Rapport         | 17 avr. | 30 avr. | Présentation + Rapport              | ⏳ À venir  |
+| Activités               | Début   | Fin     | Livrable                      | Statut      |
+|-------------------------|---------|---------|-------------------------------|-------------|
+| Ouverture de projet     | 12 jan. | 12 jan. | Proposition de projet         | ✅ Terminé  |
+| Études préliminaires    | 12 jan. | 23 jan. | Document d'analyse            | ✅ Terminé  |
+| Analyse des exigences   | 20 jan. | 27 jan. | Spécifications de l'extension | ✅ Terminé  |
+| Prototypage             | 27 jan. | 10 fev. | Prototype v1                  | 🔄 En cours |
+| Évaluation 1            | 16 fev. | 20 fev. | Feedback (rapport)            | ⏳ À venir  |
+| Sprint 1                | 16 fev. | 9 mar.  | Extension v1                  | ⏳ À venir  |
+| Évaluation 2            | 9 mar.  | 13 mar. | Feedback (rapport)            | ⏳ À venir  |
+| Sprint 2                | 9 mar.  | 30 mar. | Extension v2                  | ⏳ À venir  |
+| Sprint 3 (peaufinement) | 30 mar. | 17 avr. | Extension finale              | ⏳ À venir  |
+| Évaluation 3            | 9 mar.  | 13 mar. | Feedback (rapport)            | ⏳ À venir  |
+| Présentation + Rapport  | 17 avr. | 30 avr. | Présentation + Rapport        | ⏳ À venir  |

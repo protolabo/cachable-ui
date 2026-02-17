@@ -72,7 +72,67 @@ title: Suivi du projet
 
 Voir la page des [fonctionnalités](./features.md)
 
+## Semaine 3 (26-31 Janvier)
+
+### Objectifs de la période
+
+- Début du prototypage
+
+### Travail réalisé
+
+!!! abstract "Avancement"
+    - [x] Ajout d'un mode éditeur
+    - [x] Ajout d'une liste d'élément dans le popup
+    - [x] Ajout d'une sérialisation
+
+### Décisions et ajustements
+
+Utilisation de la librairie domJSON
+
+## Semaine 4 (02-09 Février)
+
+### Objectifs de la période
+
+- Avancer dans la première itération
+
+### Travail réalisé
+
+!!! abstract "Avancement"
+    - [x] Ajout de la fonctionnalité "voir un élément seul"
+    - [x] Ajout de la db locale avec chrome.storage.local
+    - [x] Correction de bugs d'affichage dans le popup
+    - [x] Amélioration du style du mode éditeur
+
 ### Difficultés rencontrées
 
-Aucunes
+!!! warning "Difficultés"
+    - La librairie domJSON ne gère pas correctement position, style et attributs
 
+## Semaine 5 (09-16 Février)
+
+### Objectifs de la période
+
+- Avancer dans la première itération
+
+### Travail réalisé
+
+!!! abstract "Avancement"
+    - [x] Ajout d'un arrière plan
+    - [x] Corriger des bugs de style
+    - [x] Gérer la signature des éléments
+    - [x] Ajout de la fonctionnalité "page hors-ligne"
+
+### Décisions et ajustements
+
+Pour le moment, nous réfléchissons encore à la mise au point d'un système de mise à jour des éléments. Les signatures de ceux-ci dépendent de leur contenu. Donc, dans les contenus dynamiques, certains éléments ne seront plus détectés. Pour l'instant, nous envisageons deux approches :
+
+1. Système de version (style git): Archives gardées sur la machine de l'utilisateur
+2. Système de mutation:            Adaptation intelligente du cache en identifiant nouveaux éléments et éléments modifiés (avec confirmation utilisateur) 
+
+Utilisation de la librairie html2Canva
+
+### Difficultés rencontrées
+
+!!! warning "Difficultés"
+    - Limite de 10MB dans le stockage local (chrome.storage.local)
+    - Peu d'outils disponibles pour prendre une capture d'une page entière

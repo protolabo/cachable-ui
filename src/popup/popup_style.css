@@ -181,12 +181,40 @@ input:checked+.slider:before {
   transition-duration: .3s;
 }
 
+#view_button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #b097fc30;
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  margin-top: 16px;
+  transition-duration: .3s;
+}
+
 .clear_svg_icon {
   width: 12px;
   transition-duration: .3s;
 }
 
+.view_svg_icon {
+  width: 12px;
+  transition-duration: .3s;
+}
+
 .clear_svg_icon path {
+  fill: white;
+  transition-duration: .3s;
+}
+
+.view_svg_icon path {
   fill: white;
   transition-duration: .3s;
 }
@@ -199,7 +227,21 @@ input:checked+.slider:before {
   align-items: center;
 }
 
+#view_button:hover {
+  width: 140px;
+  border-radius: 50px;
+  transition-duration: .3s;
+  background-color: rgb(78, 124, 233);
+  align-items: center;
+}
+
 #clear_button:hover .clear_svg_icon {
+  width: 50px;
+  transition-duration: .3s;
+  transform: translateY(55%);
+}
+
+#view_button:hover .view_svg_icon {
   width: 50px;
   transition-duration: .3s;
   transform: translateY(55%);
@@ -214,7 +256,23 @@ input:checked+.slider:before {
   font-size: 2px;
 }
 
+#view_button::before {
+  position: absolute;
+  top: -20px;
+  content: "See saved content";
+  color: white;
+  transition-duration: .3s;
+  font-size: 2px;
+}
+
 #clear_button:hover::before {
+  font-size: 13px;
+  opacity: 1;
+  transform: translateY(25px);
+  transition-duration: .3s;
+}
+
+#view_button:hover::before {
   font-size: 13px;
   opacity: 1;
   transform: translateY(25px);

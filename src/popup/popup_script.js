@@ -2,6 +2,7 @@ const editor_checkbox = document.getElementById('editor_checkbox')
 const tab_title = document.getElementById("tab_title");
 const tab_favicon = document.getElementById("tab_favicon");
 const clear_button = document.getElementById("clear_button");
+const view_button = document.getElementById("view_button");
 const clear_icon = document.getElementById("clear_svg_icon");
 
 let current_domain = "blank";
@@ -21,6 +22,11 @@ clear_button.addEventListener('click', () => {
   chrome.storage.local.remove(current_url, () => {
     console.log("[CachableUI] All elements removed from cache");
   });
+});
+
+view_button.addEventListener('click', () => {
+  // Open html page with all elements in chrome storage
+  view_elements();
 });
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -143,6 +149,15 @@ function view_element(element) {
   const params = new URLSearchParams();
   params.append("url", current_url);
   params.append("element", element);
+
+  chrome.tabs.create({
+    url: `offline_page/page.html?${params.toString()}`
+  });
+}
+
+function view_elements() {
+  const params = new URLSearchParams();
+  params.append("url", current_url);
 
   chrome.tabs.create({
     url: `offline_page/page.html?${params.toString()}`

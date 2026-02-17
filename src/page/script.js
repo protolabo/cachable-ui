@@ -1,5 +1,54 @@
 // import domJSON from 'domjson';
 
+// SIGN ALL ELEMENTS
+
+// Sign one child and return its signature (string)
+async function sign_one(element) {
+  if (element.getAttribute("data-cui-processed") === null || element.getAttribute("data-cui-processed") === "false") {
+    const elem_x = element.getBoundingClientRect().x + window.scrollX;
+    const elem_y = element.getBoundingClientRect().y + window.scrollY;
+
+    const s_prefix = `cui_${elem_x}_${elem_y}_${element.tagName}_`;
+
+    let s_suffix = '';
+    if (element.childElementCount == 0) {
+      s_suffix = element.textContent;
+    } else {
+      for (const child of element.children) {
+        s_suffix += sign_one(child);
+      }
+    }
+    const encoder = new TextEncoder();
+    const data = encoder.encode(s_suffix);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+
+    const signature = s_prefix + Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    element.setAttribute("data-cui-signature", signature);
+  }
+
+  element.setAttribute('data-cui-processed', 'true');
+  return element.getAttribute("data-cui-signature");
+}
+
+async function sign_all() {
+  await sign_one(document.body)
+}
+sign_all()
+
+let keymap = {};
+async function update_storage_keymap() {
+  const storage = await chrome.storage.local.get(null);
+  for (elem in storage[document.URL]) {
+    keymap[storage[document.URL][elem].signature] = true;
+  }
+}
+update_storage_keymap();
+
+//
+
 is_selection_active = false;
 
 chrome.runtime.onMessage.addListener(
@@ -7,11 +56,13 @@ chrome.runtime.onMessage.addListener(
     if (request.selection_mode === "active") {
       sendResponse({ code: 0 });
       add_selection_popup();
+      add_selected_elements(document.body);
       console.log("[CachableUI] Selection mode activated");
       is_selection_active = true;
     } else if (request.selection_mode === "inactive") {
       sendResponse({ code: 0 });
       remove_selection_popup();
+      remove_selected_elements(document.body);
       console.log("[CachableUI] Selection mode deactivated");
       is_selection_active = false;
     } else if (request.selection_mode === "ask") {
@@ -20,6 +71,31 @@ chrome.runtime.onMessage.addListener(
 
   }
 );
+
+async function add_selected_elements(parent) {
+  if (parent.getAttribute("data-cui-processed") === "true") {
+    if (await storage_contains(parent.getAttribute("data-cui-signature"))) {
+      parent.classList.add("page_element_saved");
+    } else {
+      for (child of parent.children) {
+        add_selected_elements(child);
+      }
+    }
+  }
+}
+
+async function storage_contains(signature) {
+  return keymap[signature] === true;
+}
+
+function remove_selected_elements(parent) {
+  if (parent.getAttribute("data-cui-processed") === "true") {
+    parent.classList.remove("page_element_saved");
+    for (child of parent.children) {
+      remove_selected_elements(child);
+    }
+  }
+}
 
 function add_selection_popup() {
   const overlay = document.createElement('t_cachableui_overlay');
@@ -89,7 +165,7 @@ function add_element_to_storage(element) {
   const rect_elem = element.getBoundingClientRect();
 
   let json_id = element.tagName + "_" + String(element_default_id);
-  console.log(element.id);
+  (element.id);
   if (typeof (element) == HTMLElement && typeof (element.id) == string) {
     json_id = element.id;
   } else if (false /*todo*/) { } else {
@@ -102,8 +178,9 @@ function add_element_to_storage(element) {
   const data_to_save = {
     id: json_id,
     content: element_as_string,
-    top: rect_elem.top,
-    left: rect_elem.left,
+    top: rect_elem.top + window.scrollY,
+    left: rect_elem.left + + window.scrollX,
+    signature: element.getAttribute("data-cui-signature")
   };
 
   chrome.storage.local.get([document.URL], (result) => {
@@ -120,11 +197,13 @@ function add_element_to_storage(element) {
   }
   html2canvas(document.body).then(async canvas => {
     const dataUrl = canvas.toDataURL("image/png");
-    await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: json_id});
+    await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: document.URL });
   }).catch((e) => {
     console.log("Html2Canvas error", e);
   });
   if (document.body.firstChild.id === "i_cachableui_overlay") {
     document.body.firstChild.style.visibility = "show";
   }
+
+  update_storage_keymap();
 }

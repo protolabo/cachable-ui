@@ -29,13 +29,16 @@ chrome.storage.local.get([url], (result) => {
 
                 const serialized_element = content;
                 const child = domJSON.toDOM(serialized_element);
-                document.getElementById("preview_container").appendChild(child);
-                document.getElementById("preview_container").lastChild.id = `element_preview_${key}`;
+                const child_container = document.createElement("div");
+                child_container.classList.add("child_container");
+                child_container.appendChild(child);
+                document.getElementById("preview_container").appendChild(child_container);
+                child_container.lastChild.id = `element_preview_${key}`;
                 apply_node(document.getElementById(`element_preview_${key}`), serialized_element.node);
-                document.getElementById(`element_preview_${key}`).style.position = `absolute`;
-                document.getElementById(`element_preview_${key}`).style.left = `${left}px`;
-                document.getElementById(`element_preview_${key}`).style.top = `${top}px`;
-                document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
+                child_container.style.position = `absolute`;
+                child_container.style.left = `${left}px`;
+                child_container.style.top = `${top}px`;
+                // document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
             }
         }
     }

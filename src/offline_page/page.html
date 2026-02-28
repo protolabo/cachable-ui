@@ -12,32 +12,52 @@
         }
 
         #whole {
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             margin: 0%;
 
             background-size: cover;
             background-repeat: no-repeat;
+
             position: relative;
+            z-index: 1;
         }
 
         #preview_container {
             width: 100vw;
             height: 100vh;
+            z-index: 2;
             backdrop-filter: blur(2px);
+            background-color: rgba(0, 0, 0, 0.5);
+            position: absolute;
+            isolation: isolate;
             /* background-color: rgba(0, 0, 0, 0.6) */
+        }
+
+        .child_container {
+            background: transparent;
         }
 
         #element_preview {
             position: absolute;
         }
+
+        #preview_container {
+            -webkit-mask-composite: destination-out;
+            -webkit-mask-repeat: no-repeat;
+            -webkit-mask-position: 0 0;
+            -webkit-mask-size: cover;
+            mask-composite: exclude;
+        }
     </style>
 </head>
 
 <body>
+
     <div id="whole">
         <div id="preview_container"></div>
     </div>
+
     <script src="../libs/domJSON.js"></script>
     <script src="script.js"></script>
 </body>

@@ -56,6 +56,7 @@ chrome.runtime.onMessage.addListener(
     if (request.selection_mode === "active") {
       sendResponse({ code: 0 });
       add_selection_popup();
+      remove_selected_elements(document.body);
       add_selected_elements(document.body);
       console.log("[CachableUI] Selection mode activated");
       is_selection_active = true;
@@ -75,13 +76,47 @@ chrome.runtime.onMessage.addListener(
 async function add_selected_elements(parent) {
   if (parent.getAttribute("data-cui-processed") === "true") {
     if (await storage_contains(parent.getAttribute("data-cui-signature"))) {
-      parent.classList.add("page_element_saved");
+      // parent.classList.add("page_element_saved");
+      add_box_to_overlay(parent, "saved");
     } else {
       for (child of parent.children) {
         add_selected_elements(child);
       }
     }
   }
+}
+
+function remove_box_from_overlay(element) {
+  const signature = element.getAttribute("data-cui-signature");
+  const root = document.getElementById("i_cachableui_root");
+  console.log("signature to remove", signature);
+  if (root) {
+    for (child of root.children) {
+      if (child.getAttribute("data-cui-signature") === signature) {
+        child.remove()
+      }
+    }
+  }
+}
+
+function add_box_to_overlay(element, type) {
+  let box_class = "none";
+  if (type == "saved") {
+    box_class = "box_saved";
+  } else if (type == "hovered") {
+    box_class = "box_hovered";
+  }
+  box = document.createElement("div");
+  box.classList.add(box_class);
+
+  const rect_elem = element.getBoundingClientRect();
+  box.style.top = `${rect_elem.top + window.scrollY}px`;
+  box.style.left = `${rect_elem.left + window.scrollX}px`;
+  box.style.width = `${rect_elem.right - rect_elem.left}px`;
+  box.style.height = `${rect_elem.bottom - rect_elem.top}px`;
+  box.setAttribute("data-cui-signature", element.getAttribute("data-cui-signature"));
+
+  document.getElementById("i_cachableui_root").appendChild(box);
 }
 
 async function storage_contains(signature) {
@@ -101,6 +136,10 @@ function add_selection_popup() {
   const overlay = document.createElement('t_cachableui_overlay');
   overlay.classList.add('cachableui_overlay');
   overlay.id = 'i_cachableui_overlay';
+
+  const overlay_second = document.createElement('t_cachableui_overlay_second');
+  overlay_second.classList.add('cachableui_overlay_second');
+  overlay_second.id = 'i_cachableui_overlay_second';
 
   const overlay_text = document.createElement('span');
   // overlay_text.textContent = 'YOU ARE IN EDITOR MODE';
@@ -128,33 +167,112 @@ function add_selection_popup() {
   overlay_content.appendChild(overlay_btn);
   overlay.appendChild(overlay_content);
 
-  document.body.insertBefore(overlay, document.body.firstChild);
+  // document.body.insertBefore(overlay_second, document.body.firstChild);
+  const ext_root = document.createElement("div");
+  ext_root.id = "i_cachableui_root";
+  ext_root.classList.add("cachableui_root");
+  document.documentElement.appendChild(ext_root);
+  // const shadow_root = ext_root.attachShadow({ mode: "open" });
+  // shadow_root.appendChild(overlay);
+  ext_root.appendChild(overlay);
+
+  const root_style = document.createElement("style");
+  root_style.innerHTML = `
+  .cachableui_overlay {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  border: #b097fc solid 2px;
+  box-sizing: border-box;
+}
+
+.cachableui_overlay_content {
+  color: white;
+  background-color: #957fd6;
+  z-index: 1000;
+  margin: 8px;
+  font-size: 12px;
+  border-radius: 50vh;
+  font-weight: bold;
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
+}
+
+.cachableui_overlay_second {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.cachableui_overlay_button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  padding-bottom: 6px;
+}
+  `;
+  // shadow_root.appendChild(root_style);
+  ext_root.appendChild(root_style)
 }
 
 function remove_selection_popup() {
-  document.getElementById('i_cachableui_overlay').remove();
+  document.getElementById('i_cachableui_root').remove();
 }
 
 window.onmouseover = function (event) {
+  // console.log(is_selection_active, !String(event.target.id).startsWith("i_cachableui_"), !check_for_stored_parent(event.target))
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
-    event.target.classList.add("page_element_hovered");
+    // event.target.classList.add("page_element_hovered");
+    // console.log(event.target);
+    
+    document.getElementById("i_cachableui_root").replaceChildren();
+    add_box_to_overlay(event.target, "hovered");
+    add_selected_elements(document.body);
   }
 };
 
+// Return True if there is a stored parent
+function check_for_stored_parent(child) {
+  curr = child;
+  while (curr != document.body) {
+    if (curr.getAttribute("data-cui-signature") && storage_contains(curr.getAttribute("data-cui-signature"))) {
+      console.log("indeed", curr.getAttribute("data-cui-signature"), keymap, keymap[curr.getAttribute("data-cui-signature")], keymap[curr.getAttribute("data-cui-signature")] === true)
+      return true;
+    }
+    curr = child.parentNode;
+  }
+  return document.body.getAttribute("data-cui-signature") && storage_contains(document.body.getAttribute("data-cui-signature"))
+}
+
 window.onmouseout = function (event) {
-  event.target.classList.remove("page_element_hovered");
+  // event.target.classList.remove("page_element_hovered");
+  remove_box_from_overlay(event.target);
 };
 
 window.onclick = function (event) {
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
-    event.target.classList.remove("page_element_hovered");
+    remove_box_from_overlay(event.target);
     add_element_to_storage(event.target);
-    event.target.classList.add("page_element_saved");
-
+    add_box_to_overlay(event.target, "saved");
+    return false;
   }
-  return false;
+  return true;
 };
 
 // IO OPERATIONS
@@ -192,18 +310,28 @@ function add_element_to_storage(element) {
   });
 
   // Take a screenshot and save it to the DB (remove overlay)
+  let old_display = 'inherit';
   if (document.body.firstChild.id === "i_cachableui_overlay") {
-    document.body.firstChild.style.visibility = "hidden";
+    old_display = document.body.firstChild.style.display;
+    document.body.firstChild.style.display = "none";
   }
   html2canvas(document.body).then(async canvas => {
-    const dataUrl = canvas.toDataURL("image/png");
+    const dataUrl = canvas.toDataURL("image/png", 1);
     await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: document.URL });
   }).catch((e) => {
     console.log("Html2Canvas error", e);
   });
   if (document.body.firstChild.id === "i_cachableui_overlay") {
-    document.body.firstChild.style.visibility = "show";
+    document.body.firstChild.style.display = old_display;
   }
 
   update_storage_keymap();
 }
+
+chrome.storage.onChanged.addListener(
+  () => {
+    update_storage_keymap();
+
+    // add_selected_elements()
+  }
+);

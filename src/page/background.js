@@ -89,6 +89,9 @@ async function clearObjectStore() {
 
         request.onsuccess = () => {
             console.log("All records cleared from object store");
+            listAllKeys().then(r => {
+                console.log(r)
+            });
             resolve();
         };
 

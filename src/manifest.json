@@ -8,7 +8,9 @@
     "storage",
     "tabs",
     "downloads",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "webNavigation",
+    "debugger"
   ],
   "manifest_version": 3,
   "action": {
@@ -22,7 +24,6 @@
     {
       "js": [
         "libs/domJSON.js",
-        "libs/html2Canvas.min.js",
         "page/script.js"
       ],
       "css": [

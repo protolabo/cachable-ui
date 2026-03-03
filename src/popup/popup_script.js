@@ -78,8 +78,10 @@ function update_elements_list(storage) {
     no_child_label.classList.add("no_child_label");
     ui_list.appendChild(no_child_label);
     clear_button.style.display = "none";
+    view_button.style.display = "none";
   } else {
     clear_button.style.display = "flex";
+    view_button.style.display = "flex";
   }
 }
 

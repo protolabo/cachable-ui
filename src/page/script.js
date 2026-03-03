@@ -1,6 +1,21 @@
-// import domJSON from 'domjson';
+saved_elements_onpage = [];
+saved_elements_onoverlay = [];
+function updatePosition() {
+  for (let i = 0; i < saved_elements_onoverlay.length; i++) {
+    const rect = saved_elements_onpage[i].getBoundingClientRect();
 
-// SIGN ALL ELEMENTS
+    const overlay_box = saved_elements_onoverlay[i];
+
+    console.log(scrollY);
+    overlay_box.style.top = (rect.top) + "px";
+    overlay_box.style.left = (rect.left) + "px";
+    overlay_box.style.height = (rect.bottom - rect.top) + "px";
+    overlay_box.style.width = (rect.right - rect.left) + "px";
+  }
+}
+
+window.addEventListener("scroll", updatePosition);
+window.addEventListener("resize", updatePosition);
 
 // Sign one child and return its signature (string)
 async function sign_one(element) {
@@ -89,13 +104,13 @@ async function add_selected_elements(parent) {
 function remove_box_from_overlay(element) {
   const signature = element.getAttribute("data-cui-signature");
   const root = document.getElementById("i_cachableui_root");
-  console.log("signature to remove", signature);
-  if (root) {
-    for (child of root.children) {
-      if (child.getAttribute("data-cui-signature") === signature) {
-        child.remove()
-      }
-    }
+
+  const el_idx = saved_elements_onpage.indexOf(element);
+  if (el_idx > -1) {
+    const overlay_box = saved_elements_onoverlay[el_idx];
+    saved_elements_onoverlay.splice(el_idx, 1);
+    saved_elements_onpage.splice(el_idx, 1);
+    overlay_box?.remove();
   }
 }
 
@@ -109,14 +124,19 @@ function add_box_to_overlay(element, type) {
   box = document.createElement("div");
   box.classList.add(box_class);
 
-  const rect_elem = element.getBoundingClientRect();
-  box.style.top = `${rect_elem.top + window.scrollY}px`;
-  box.style.left = `${rect_elem.left + window.scrollX}px`;
-  box.style.width = `${rect_elem.right - rect_elem.left}px`;
-  box.style.height = `${rect_elem.bottom - rect_elem.top}px`;
+  // const rect_elem = element.getBoundingClientRect();
+  // box.style.top = `${rect_elem.top + window.scrollY}px`;
+  // box.style.left = `${rect_elem.left + window.scrollX}px`;
+  // box.style.width = `${rect_elem.right - rect_elem.left}px`;
+  // box.style.height = `${rect_elem.bottom - rect_elem.top}px`;
+  box.style.position = "fixed";
   box.setAttribute("data-cui-signature", element.getAttribute("data-cui-signature"));
 
   document.getElementById("i_cachableui_root").appendChild(box);
+
+  saved_elements_onoverlay.push(box);
+  saved_elements_onpage.push(element);
+  updatePosition();
 }
 
 async function storage_contains(signature) {
@@ -239,7 +259,7 @@ window.onmouseover = function (event) {
     event.preventDefault();
     // event.target.classList.add("page_element_hovered");
     // console.log(event.target);
-    
+
     document.getElementById("i_cachableui_root").replaceChildren();
     add_box_to_overlay(event.target, "hovered");
     add_selected_elements(document.body);
@@ -261,7 +281,7 @@ function check_for_stored_parent(child) {
 
 window.onmouseout = function (event) {
   // event.target.classList.remove("page_element_hovered");
-  remove_box_from_overlay(event.target);
+  // remove_box_from_overlay(event.target);
 };
 
 window.onclick = function (event) {
@@ -315,12 +335,15 @@ function add_element_to_storage(element) {
     old_display = document.body.firstChild.style.display;
     document.body.firstChild.style.display = "none";
   }
-  html2canvas(document.body).then(async canvas => {
-    const dataUrl = canvas.toDataURL("image/png", 1);
-    await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: document.URL });
-  }).catch((e) => {
-    console.log("Html2Canvas error", e);
-  });
+  // html2canvas(document.body).then(async canvas => {
+  //   const dataUrl = canvas.toDataURL("image/png", 1);
+  //   await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: document.URL });
+  // }).catch((e) => {
+  //   console.log("[Html2Canvas] error", e);
+  // });
+  chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", id: document.URL });
+
+
   if (document.body.firstChild.id === "i_cachableui_overlay") {
     document.body.firstChild.style.display = old_display;
   }
@@ -331,7 +354,6 @@ function add_element_to_storage(element) {
 chrome.storage.onChanged.addListener(
   () => {
     update_storage_keymap();
-
-    // add_selected_elements()
+    add_selected_elements();
   }
 );

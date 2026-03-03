@@ -38,6 +38,7 @@ chrome.storage.local.get([url], (result) => {
                 child_container.style.position = `absolute`;
                 child_container.style.left = `${left}px`;
                 child_container.style.top = `${top}px`;
+                child_container.firstChild.style.margin = "0";
                 // document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
             }
         }

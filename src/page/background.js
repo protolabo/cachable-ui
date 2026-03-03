@@ -21,9 +21,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === "SAVE_SCREENSHOT") {
         console.log("[CachableUI DB] Reveived a SAVE request");
-        saveScreenshot(message.url, message.id)
-            .then(() => sendResponse({ success: true }))
-            .catch(error => sendResponse({ error: error.message }));
+
+        const tabId = sender.tab.id;
+        const screenshot_data = captureFullPage(tabId);
+
+        if (screenshot_data !== null) {
+            console.log("saving screenshot for: ", message.id)
+            saveScreenshot(screenshot_data, message.id)
+                .then(() => sendResponse({ success: true }))
+                .catch(error => sendResponse({ error: error.message }));
+        }
 
         return true;
     }
@@ -153,3 +160,51 @@ async function listAllKeys() {
         request.onerror = (e) => reject(e);
     });
 }
+
+async function captureFullPage(tabId) {
+    const target = { tabId };
+    await chrome.debugger.attach(target, "1.3");
+
+    try {
+        const { data } = await chrome.debugger.sendCommand(target, "Page.captureScreenshot", {
+            format: "png",
+            captureBeyondViewport: true,
+            fromSurface: true
+        });
+
+        console.log("Screenshot captured!");
+
+        console.log(data);
+
+        // const url = `data:image/png;base64,${data}`;
+        // chrome.downloads.download({ url, filename: "screenshot.png" });
+
+        return data;
+
+    } catch (error) {
+        console.error("Failed to capture screenshot:", error);
+    } finally {
+        chrome.debugger.detach(target);
+    }
+
+    return null;
+}
+
+// Detect no internet
+
+async function get_current_url() {
+    let options = { active: true, lastFocusedWindow: true };
+    let [tab] = await chrome.tabs.query(options);
+    return tab?.url;
+}
+
+chrome.webNavigation.onErrorOccurred.addListener(async (details) => {
+    if (details.frameId === 0 && details.error === "net::ERR_INTERNET_DISCONNECTED") {
+        const current_url = await get_current_url();
+        const params = new URLSearchParams();
+        params.append("url", current_url);
+        chrome.tabs.update(details.tabId, {
+            url: chrome.runtime.getURL(`offline_page/page.html?${params.toString()}`)
+        });
+    }
+});

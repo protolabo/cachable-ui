@@ -131,7 +131,7 @@ function add_box_to_overlay(element, type) {
   box.style.position = "fixed";
   box.setAttribute("data-cui-signature", element.getAttribute("data-cui-signature"));
 
-  document.getElementById("i_cachableui_root").appendChild(box);
+  document.getElementById("i_cachableui_overlay_second").appendChild(box);
 
   saved_elements_onoverlay.push(box);
   saved_elements_onpage.push(element);
@@ -194,6 +194,7 @@ function add_selection_popup() {
   // const shadow_root = ext_root.attachShadow({ mode: "open" });
   // shadow_root.appendChild(overlay);
   ext_root.appendChild(overlay);
+  ext_root.appendChild(overlay_second);
 
   const root_style = document.createElement("style");
   root_style.innerHTML = `
@@ -259,7 +260,7 @@ window.onmouseover = function (event) {
     // event.target.classList.add("page_element_hovered");
     // console.log(event.target);
 
-    document.getElementById("i_cachableui_root").replaceChildren();
+    document.getElementById("i_cachableui_overlay_second").replaceChildren();
     add_box_to_overlay(event.target, "hovered");
     add_selected_elements(document.body);
   }
@@ -340,7 +341,11 @@ function add_element_to_storage(element) {
   // }).catch((e) => {
   //   console.log("[Html2Canvas] error", e);
   // });
-  chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", id: document.URL });
+  chrome.runtime.sendMessage({
+    type: "SAVE_SCREENSHOT", id: document.URL, scrollHeight: document.documentElement.scrollHeight,
+    viewportHeight: window.innerHeight,
+    width: window.innerWidth
+  });
 
 
   if (document.body.firstChild.id === "i_cachableui_overlay") {

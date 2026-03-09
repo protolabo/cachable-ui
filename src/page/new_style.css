@@ -82,6 +82,15 @@
   pointer-events: none;
 }
 
+.cachableui_overlay_second {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+}
+
 .mdi_icon {
   fill: #fff;
   /* size: 24px; */

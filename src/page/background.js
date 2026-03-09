@@ -23,7 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("[CachableUI DB] Reveived a SAVE request");
 
         const tabId = sender.tab.id;
-        captureFullPage(tabId).then(data => {
+        captureFullPage(tabId, message.scrollHeight, message.viewportHeight, message.width).then(data => {
             if (data !== null) {
                 console.log("saving screenshot for: ", message.id)
                 saveScreenshot(data, message.id)
@@ -114,17 +114,17 @@ async function clearObjectStore() {
 }
 
 async function saveScreenshot(dataUrl, dataId) {
-    console.log("a");
+    // console.log("a");
     const db = await openDB();
-    console.log("b " + dataUrl);
+    // console.log("b " + dataUrl);
     // const blob = await dataURLtoBlob(dataUrl);
     const blob = dataUrl;
-    console.log("c");
+    // console.log("c");
 
     const transaction = db.transaction("images", "readwrite");
-    console.log("d");
+    // console.log("d");
     const store = transaction.objectStore("images");
-    console.log("e");
+    // console.log("e");
 
     const record = {
         id: dataId, // unique key
@@ -192,13 +192,44 @@ async function captureFullPage(tabId) {
         fromSurface: true,
         quality: 60,
     });
-    
+
     // Prepend the header to make it a valid Data URL
     const dataUrl = `data:image/jpeg;base64,${screenshot.data}`;
-    
+
     const response = await fetch(dataUrl);
     return await response.blob();
 }
+
+// async function captureFullPage(tabId, scrollHeight, viewportHeight, width) {
+//     const canvas = new OffscreenCanvas(width, scrollHeight);
+//     const ctx = canvas.getContext("2d");
+//     let currentScroll = 0;
+
+//     while (currentScroll < scrollHeight) {
+//         // 2. Scroll to the next segment
+//         await chrome.tabs.sendMessage(tabId, { action: "scrollTo", y: currentScroll });
+
+//         // Wait for the browser to finish rendering the scroll (adjust as needed)
+//         await new Promise(resolve => setTimeout(resolve, 300));
+
+//         // 3. Capture the visible area
+//         const dataUrl = await chrome.tabs.captureVisibleTab(null, { format: "png" });
+//         const blob = await (await fetch(dataUrl)).blob();
+//         const bitmap = await createImageBitmap(blob);
+
+//         // 4. Stitch the segment into the canvas
+//         ctx.drawImage(bitmap, 0, currentScroll);
+//         currentScroll += viewportHeight;
+//     }
+
+//     // 5. Export final full image
+//     const finalBlob = await canvas.convertToBlob();
+//     return new Promise((resolve) => {
+//         const reader = new FileReader();
+//         reader.onloadend = () => resolve(reader.result);
+//         reader.readAsDataURL(finalBlob);
+//     });
+// }
 
 // Detect no internet
 

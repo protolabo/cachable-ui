@@ -23,14 +23,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("[CachableUI DB] Reveived a SAVE request");
 
         const tabId = sender.tab.id;
-        const screenshot_data = captureFullPage(tabId);
-
-        if (screenshot_data !== null) {
-            console.log("saving screenshot for: ", message.id)
-            saveScreenshot(screenshot_data, message.id)
-                .then(() => sendResponse({ success: true }))
-                .catch(error => sendResponse({ error: error.message }));
-        }
+        captureFullPage(tabId).then(data => {
+            if (data !== null) {
+                console.log("saving screenshot for: ", message.id)
+                saveScreenshot(data, message.id)
+                    .then(() => sendResponse({ success: true }))
+                    .catch(error => sendResponse({ error: error.message }));
+            }
+        });
 
         return true;
     }
@@ -54,15 +54,19 @@ function blobToDataURL(blob) {
 }
 
 
-function dataURLtoBlob(dataurl) {
-    const [header, base64] = dataurl.split(',');
-    const mime = header.match(/:(.*?);/)[1];
-    const binary = atob(base64);
-    const array = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-        array[i] = binary.charCodeAt(i);
-    }
-    return new Blob([array], { type: mime });
+async function dataURLtoBlob(dataurl) {
+    // const [header, base64] = dataurl.split(',');
+    // const mime = header.match(/:(.*?);/)[1];
+    // const binary = atob(base64);
+    // const array = new Uint8Array(binary.length);
+    // for (let i = 0; i < binary.length; i++) {
+    //     array[i] = binary.charCodeAt(i);
+    // }
+    // return new Blob([array], { type: mime });
+    console.log("b1");
+    const response = await fetch(dataurl);
+    console.log("b2");
+    return await response.blob();
 }
 
 function openDB() {
@@ -97,7 +101,7 @@ async function clearObjectStore() {
         request.onsuccess = () => {
             console.log("All records cleared from object store");
             listAllKeys().then(r => {
-                console.log(r)
+                // console.log(r)
             });
             resolve();
         };
@@ -110,17 +114,24 @@ async function clearObjectStore() {
 }
 
 async function saveScreenshot(dataUrl, dataId) {
-    clearObjectStore();
+    console.log("a");
     const db = await openDB();
-    const blob = dataURLtoBlob(dataUrl);
+    console.log("b " + dataUrl);
+    // const blob = await dataURLtoBlob(dataUrl);
+    const blob = dataUrl;
+    console.log("c");
 
     const transaction = db.transaction("images", "readwrite");
+    console.log("d");
     const store = transaction.objectStore("images");
+    console.log("e");
 
     const record = {
         id: dataId, // unique key
         blob: blob
     };
+
+    console.log("saving: " + JSON.stringify(record));
 
     return new Promise((resolve, reject) => {
         const request = store.add(record);
@@ -130,6 +141,8 @@ async function saveScreenshot(dataUrl, dataId) {
 }
 
 async function getScreenshot(id) {
+    const keys = await listAllKeys();
+
     const db = await openDB();
     const transaction = db.transaction("images", "readonly");
     const store = transaction.objectStore("images");
@@ -140,7 +153,7 @@ async function getScreenshot(id) {
             if (request.result) {
                 resolve(request.result.blob);
             } else {
-                reject("No screenshot found for id " + id);
+                reject("No screenshot found for id " + id + " (we only have " + JSON.stringify(keys) + ")");
             }
         };
         request.onerror = (e) => reject(e);
@@ -161,33 +174,30 @@ async function listAllKeys() {
     });
 }
 
+// async function captureFullPage(tabId) {
+//     // const screenshot = await chrome.tabs.captureVisibleTab(null, {});
+//     await chrome.debugger.attach({ tabId }, "1.3");
+//     const screenshot = await chrome.debugger.sendCommand({ tabId }, "Page.captureScreenshot", {
+//         format: "jpeg",
+//         fromSurface: true,
+//         quality: 60,
+//     });
+//     return screenshot.data;
+// }
+
 async function captureFullPage(tabId) {
-    const target = { tabId };
-    await chrome.debugger.attach(target, "1.3");
-
-    try {
-        const { data } = await chrome.debugger.sendCommand(target, "Page.captureScreenshot", {
-            format: "png",
-            captureBeyondViewport: true,
-            fromSurface: true
-        });
-
-        console.log("Screenshot captured!");
-
-        console.log(data);
-
-        // const url = `data:image/png;base64,${data}`;
-        // chrome.downloads.download({ url, filename: "screenshot.png" });
-
-        return data;
-
-    } catch (error) {
-        console.error("Failed to capture screenshot:", error);
-    } finally {
-        chrome.debugger.detach(target);
-    }
-
-    return null;
+    await chrome.debugger.attach({ tabId }, "1.3");
+    const screenshot = await chrome.debugger.sendCommand({ tabId }, "Page.captureScreenshot", {
+        format: "jpeg",
+        fromSurface: true,
+        quality: 60,
+    });
+    
+    // Prepend the header to make it a valid Data URL
+    const dataUrl = `data:image/jpeg;base64,${screenshot.data}`;
+    
+    const response = await fetch(dataUrl);
+    return await response.blob();
 }
 
 // Detect no internet

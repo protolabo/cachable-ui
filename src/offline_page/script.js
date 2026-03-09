@@ -53,15 +53,14 @@ function apply_node(node, json) {
 
 async function get_bg() {
     // const key = (element !== null) ? element : "blank";
-
-    console.log("Retrieve screenshot");
     try {
-        const blob = await chrome.runtime.sendMessage({
+        const img = await chrome.runtime.sendMessage({
             type: "GET_SCREENSHOT",
             id: url
         });
-        // chrome.tabs.create({ url: blob.image });
-        document.getElementById("whole").style.backgroundImage = `url('${blob.image}')`;
+        // console.log("ret is: " + JSON.stringify(img));
+        // console.log("img is " + img.image);
+        document.getElementById("whole").style.backgroundImage = `url('${img.image}')`;
     } catch (err) {
         console.error("Error:", err);
     }

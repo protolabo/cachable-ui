@@ -6,7 +6,6 @@ function updatePosition() {
 
     const overlay_box = saved_elements_onoverlay[i];
 
-    console.log(scrollY);
     overlay_box.style.top = (rect.top) + "px";
     overlay_box.style.left = (rect.left) + "px";
     overlay_box.style.height = (rect.bottom - rect.top) + "px";

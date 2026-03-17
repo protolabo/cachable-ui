@@ -86,7 +86,8 @@ function update_elements_list(storage) {
 }
 
 function gen_html_for_tile(json) {
-  return `<span class="element_txt">${json.id}</span>
+  const id_list = json.id.split("_");
+  return `<input type="text" class="element_txt" value="${id_list[3]}  x:${Math.ceil(parseFloat(id_list[1]))} y:${Math.ceil(parseFloat(id_list[2]))} ${id_list[4]}"/>
       <button class="element_btn" id="view_elem_${json.id}">
         <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
           width="16" height="16">

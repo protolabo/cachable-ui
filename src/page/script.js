@@ -302,13 +302,13 @@ element_default_id = 1
 function add_element_to_storage(element) {
   const rect_elem = element.getBoundingClientRect();
 
-  let json_id = element.tagName + "_" + String(element_default_id);
-  (element.id);
-  if (typeof (element) == HTMLElement && typeof (element.id) == string) {
-    json_id = element.id;
-  } else if (false /*todo*/) { } else {
-    element_default_id++;
-  }
+  let json_id = element.getAttribute("data-cui-signature");
+  // (element.id);
+  // if (typeof (element) == HTMLElement && typeof (element.id) == string) {
+  //   json_id = element.id;
+  // } else if (false /*todo*/) { } else {
+  //   element_default_id++;
+  // }
 
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true

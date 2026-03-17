@@ -138,8 +138,17 @@ input:checked+.slider:before {
 }
 
 .element_txt {
+  min-width: 0; 
+  flex: 1; 
   margin-right: auto;
-
+  color: #fff;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0;
 }
 
 .element_btn {

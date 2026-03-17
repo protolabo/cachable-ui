@@ -54,6 +54,7 @@ sign_all()
 
 let keymap = {};
 async function update_storage_keymap() {
+  keymap = {};
   const storage = await chrome.storage.local.get(null);
   for (elem in storage[document.URL]) {
     keymap[storage[document.URL][elem].signature] = true;
@@ -130,6 +131,7 @@ function add_box_to_overlay(element, type) {
   // box.style.height = `${rect_elem.bottom - rect_elem.top}px`;
   box.style.position = "fixed";
   box.setAttribute("data-cui-signature", element.getAttribute("data-cui-signature"));
+  box.setAttribute("data-cui-overlaytype", type);
 
   document.getElementById("i_cachableui_overlay_second").appendChild(box);
 
@@ -198,6 +200,10 @@ function add_selection_popup() {
 
   const root_style = document.createElement("style");
   root_style.innerHTML = `
+  * {
+    font-family: sans-serif;
+  }
+
   .cachableui_overlay {
   width: 100%;
   height: 100%;
@@ -259,37 +265,41 @@ window.onmouseover = function (event) {
     event.preventDefault();
     // event.target.classList.add("page_element_hovered");
     // console.log(event.target);
+    const par_element = parents_saved(event.target);
 
     document.getElementById("i_cachableui_overlay_second").replaceChildren();
-    add_box_to_overlay(event.target, "hovered");
+    add_box_to_overlay(par_element ? par_element : event.target, "hovered");
     add_selected_elements(document.body);
   }
 };
 
-// Return True if there is a stored parent
-function check_for_stored_parent(child) {
-  curr = child;
-  while (curr != document.body) {
-    if (curr.getAttribute("data-cui-signature") && storage_contains(curr.getAttribute("data-cui-signature"))) {
-      console.log("indeed", curr.getAttribute("data-cui-signature"), keymap, keymap[curr.getAttribute("data-cui-signature")], keymap[curr.getAttribute("data-cui-signature")] === true)
-      return true;
+document.addEventListener('mouseleave', () => {
+  const overlay = document.getElementById("i_cachableui_overlay_second");
+  if (overlay) {
+    for (const box of overlay.children) {
+      if (box.getAttribute("data-cui-overlaytype") === "hovered") {
+        box.remove();
+      }
     }
-    curr = child.parentNode;
   }
-  return document.body.getAttribute("data-cui-signature") && storage_contains(document.body.getAttribute("data-cui-signature"))
-}
+})
 
-window.onmouseout = function (event) {
-  // event.target.classList.remove("page_element_hovered");
-  // remove_box_from_overlay(event.target);
-};
-
-window.onclick = function (event) {
+window.onclick = async function (event) {
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
-    remove_box_from_overlay(event.target);
-    add_element_to_storage(event.target);
-    add_box_to_overlay(event.target, "saved");
+
+    const par_element = parents_saved(event.target);
+    const chld_elements = children_saved(event.target);
+    if (par_element === null) {
+      // Adding a parent remove all children from storage
+      await remove_multiple_from_storage(chld_elements);
+
+      remove_box_from_overlay(event.target);
+      add_element_to_storage(event.target);
+      add_box_to_overlay(event.target, "saved");
+    } else {
+      remove_from_storage(par_element);
+    }
     return false;
   }
   return true;
@@ -297,19 +307,45 @@ window.onclick = function (event) {
 
 // IO OPERATIONS
 
-element_default_id = 1
+function remove_from_storage(element) {
+  let json_id = element.getAttribute("data-cui-signature");
+
+  chrome.storage.local.get([document.URL], (result) => {
+    const data = result[document.URL];
+    if (data && data[json_id] !== undefined) {
+      delete data[json_id];
+      chrome.storage.local.set({ [document.URL]: data }, () => {
+        console.log(`[CachableUI] Deleted ${json_id} from storage ${document.URL}`);
+      });
+    }
+  });
+}
+
+async function remove_multiple_from_storage(elements) {
+  if (elements.length === 0) {
+    return;
+  }
+
+  await chrome.storage.local.get([document.URL]).then((result) => {
+    const data = result[document.URL];
+
+    for (const element of elements) {
+      let json_id = element.getAttribute("data-cui-signature");
+      if (data && data[json_id] !== undefined) {
+        delete data[json_id];
+      }
+    }
+
+    chrome.storage.local.set({ [document.URL]: data }, () => {
+      console.log(`[CachableUI] Deleted multiple from storage ${document.URL}`);
+    });
+  });
+}
 
 function add_element_to_storage(element) {
   const rect_elem = element.getBoundingClientRect();
 
   let json_id = element.getAttribute("data-cui-signature");
-  // (element.id);
-  // if (typeof (element) == HTMLElement && typeof (element.id) == string) {
-  //   json_id = element.id;
-  // } else if (false /*todo*/) { } else {
-  //   element_default_id++;
-  // }
-
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
   });
@@ -335,12 +371,6 @@ function add_element_to_storage(element) {
     old_display = document.body.firstChild.style.display;
     document.body.firstChild.style.display = "none";
   }
-  // html2canvas(document.body).then(async canvas => {
-  //   const dataUrl = canvas.toDataURL("image/png", 1);
-  //   await chrome.runtime.sendMessage({ type: "SAVE_SCREENSHOT", url: dataUrl, id: document.URL });
-  // }).catch((e) => {
-  //   console.log("[Html2Canvas] error", e);
-  // });
   chrome.runtime.sendMessage({
     type: "SAVE_SCREENSHOT", id: document.URL, scrollHeight: document.documentElement.scrollHeight,
     viewportHeight: window.innerHeight,
@@ -356,8 +386,37 @@ function add_element_to_storage(element) {
 }
 
 chrome.storage.onChanged.addListener(
-  () => {
-    update_storage_keymap();
-    add_selected_elements();
+  async () => {
+    const old_keymap = structuredClone(keymap);
+    await update_storage_keymap();
+    document.getElementById("i_cachableui_overlay_second")?.replaceChildren();
+    add_selected_elements(document.body);
   }
 );
+
+function parents_saved(element) {
+  let curr = element;
+  while (curr) {
+    if (curr.getAttribute("data-cui-signature") in keymap) {
+      return curr;
+    }
+    curr = curr.parentElement;
+  }
+
+  return null;
+}
+
+function children_saved(element) {
+  // Establish a list of all saved children for an element
+  let ret = [];
+
+  if (element.getAttribute("data-cui-signature") in keymap) {
+    ret.push(element);
+  } else {
+    for (const child of element.children) {
+      ret.push(...children_saved(child));
+    }
+  }
+
+  return ret;
+}

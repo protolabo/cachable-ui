@@ -11,15 +11,62 @@
 } */
 
 .box_hovered {
-  background-color: #b097fc87;
-  outline: #b097fc dashed 2px;
+  background-color: #9f7fff87;
+  outline: #8666e4 dashed 2px;
   position: absolute;
+  z-index: 1001;
 }
 
 .box_saved {
-  background-color: #97fce187;
-  outline: #6ef3b1 dashed 2px;
+  background-color: #76d8bea3;
+  outline: #61e3a2 solid 2px;
   position: absolute;
+  z-index: 1002;
+}
+
+.svg_saved {
+  width: 64px;
+  height: 64px;
+  max-width: 90%;
+  max-height: 90%;
+  aspect-ratio: 1;
+  fill: rgba(255, 255, 255, 0.622);
+  top: 50%;
+  left: 50%;
+  position: relative;
+  transform: translate(-50%, -50%);
+}
+
+.svg_hovered_saved {
+  width: 70px;
+  height: 70px;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  fill: rgba(255, 255, 255, 0.622);
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.label_saved {
+  color: #fff;
+  background-color: #50c48ae0;
+  border-radius: 0 0 4px 0;
+  padding: 2px 4px;
+  font-family: sans-serif;
+  position: absolute;
+  /* transform: translateY(-100%); */
+
+  overflow: hidden;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  max-height: 90%;
+  max-width: 40%;
+  font-size: 90%;
 }
 
 .body_selection_mode {

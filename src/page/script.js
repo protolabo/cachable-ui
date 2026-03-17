@@ -122,6 +122,15 @@ function add_box_to_overlay(element, type) {
     box_class = "box_hovered";
   }
   box = document.createElement("div");
+  if (type === "saved") {
+    // <svg class="svg_hovered_saved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"/></svg>
+
+    const sign_list = element.getAttribute("data-cui-signature").split("_");
+    box.innerHTML = `
+    <span class="label_saved">${sign_list[3]}  x:${Math.ceil(parseFloat(sign_list[1]))} y:${Math.ceil(parseFloat(sign_list[2]))} ${sign_list[4]}</span>
+    <svg class="svg_saved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm32 96c0-17.7 14.3-32 32-32l160 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+    `;
+  }
   box.classList.add(box_class);
 
   // const rect_elem = element.getBoundingClientRect();
@@ -209,29 +218,27 @@ function add_selection_popup() {
   height: 100%;
   pointer-events: none;
   position: fixed;
-  z-index: 1000;
+  z-index: 1003;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  border: #b097fc solid 2px;
+  border: #8666e4 solid 2px;
   box-sizing: border-box;
 }
 
 .cachableui_overlay_content {
   color: white;
-  background-color: #957fd6;
+  background-color: #8666e4;
   z-index: 1000;
-  margin: 8px;
   font-size: 12px;
   border-radius: 50vh;
   font-weight: bold;
   pointer-events: auto;
   display: flex;
   gap: 8px;
+  align-items: center;
   justify-content: center;
-  padding-top: 8px;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding: 8px;
   box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
 }
 
@@ -242,13 +249,19 @@ function add_selection_popup() {
   top: 0;
   left: 0;
   pointer-events: none;
+  transform: translateY(4px);
 }
 
 .cachableui_overlay_button {
   background-color: transparent;
   border: none;
-  padding: 0;
-  padding-bottom: 6px;
+  padding: 0px;
+  transform: translateY(2px);
+}
+
+.cachableui_overlay_text {
+  padding: 0px;
+  transform: translateY(2px);
 }
   `;
   // shadow_root.appendChild(root_style);
@@ -296,7 +309,7 @@ window.onclick = async function (event) {
 
       remove_box_from_overlay(event.target);
       add_element_to_storage(event.target);
-      add_box_to_overlay(event.target, "saved");
+      // add_box_to_overlay(event.target, "saved");
     } else {
       remove_from_storage(par_element);
     }

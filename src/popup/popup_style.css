@@ -259,7 +259,7 @@ input:checked+.slider:before {
 #clear_button::before {
   position: absolute;
   top: -20px;
-  content: "Clear cache";
+  content: "Vider le cache";
   color: white;
   transition-duration: .3s;
   font-size: 2px;
@@ -268,7 +268,7 @@ input:checked+.slider:before {
 #view_button::before {
   position: absolute;
   top: -20px;
-  content: "See saved content";
+  content: "Voir le cache";
   color: white;
   transition-duration: .3s;
   font-size: 2px;

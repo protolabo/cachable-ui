@@ -125,9 +125,15 @@ function add_box_to_overlay(element, type) {
   if (type === "saved") {
     // <svg class="svg_hovered_saved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M55.1 73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L147.2 256 9.9 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192.5 301.3 329.9 438.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.8 256 375.1 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192.5 210.7 55.1 73.4z"/></svg>
 
-    const sign_list = element.getAttribute("data-cui-signature").split("_");
+    const signature = element.getAttribute("data-cui-signature");
+    const uuid = element.getAttribute("data-cui-uuid");
+    let displayed_key = uuid ? uuid : signature;
+    if (displayed_key === signature) {
+      const id_list = displayed_key.split("_");
+      displayed_key = `${id_list[3]}  x:${Math.ceil(parseFloat(id_list[1]))} y:${Math.ceil(parseFloat(id_list[2]))}`;
+    }
     box.innerHTML = `
-    <span class="label_saved">${sign_list[3]}  x:${Math.ceil(parseFloat(sign_list[1]))} y:${Math.ceil(parseFloat(sign_list[2]))} ${sign_list[4]}</span>
+    <span class="label_saved">${displayed_key}</span>
     <svg class="svg_saved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm32 96c0-17.7 14.3-32 32-32l160 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
     `;
   }
@@ -358,23 +364,27 @@ async function remove_multiple_from_storage(elements) {
 function add_element_to_storage(element) {
   const rect_elem = element.getBoundingClientRect();
 
-  let json_id = element.getAttribute("data-cui-signature");
+  const element_signature = element.getAttribute("data-cui-signature");
+  const element_uuid = element.getAttribute("data-cui-uuid");
+  const element_key = element_uuid ? element_uuid : element_signature;
+  console.log("key is " + element_key);
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
   });
   const data_to_save = {
-    id: json_id,
+    key: element_key,
+    signature: element_signature,
+    uuid: element_uuid,
     content: element_as_string,
     top: rect_elem.top + window.scrollY,
     left: rect_elem.left + + window.scrollX,
-    signature: element.getAttribute("data-cui-signature")
   };
 
   chrome.storage.local.get([document.URL], (result) => {
     let current_cache = result[document.URL] || {};
-    current_cache[json_id] = data_to_save;
+    current_cache[element_key] = data_to_save;
     chrome.storage.local.set({ [document.URL]: current_cache }, () => {
-      console.log("[CachableUI] Save to database: " + json_id);
+      console.log("[CachableUI] Save to database: " + element_key);
     });
   });
 

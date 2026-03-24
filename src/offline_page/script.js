@@ -68,3 +68,9 @@ async function get_bg() {
 
 get_bg()
 
+window.addEventListener('online', () => {
+    console.log("[CachableUI] The connection is back");
+    setTimeout(() => {
+        window.location.assign(url);
+    }, 500);
+});

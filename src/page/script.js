@@ -47,10 +47,47 @@ async function sign_one(element) {
   return element.getAttribute("data-cui-signature");
 }
 
-async function sign_all() {
-  await sign_one(document.body)
+function compare_uuid_one(element, uuidmap) {
+  const signature = element.getAttribute("data-cui-signature");
+  const uuid = element.getAttribute("data-cui-uuid");
+  if (uuid !== null && uuidmap.contains(uuid)) {
+    // Same element
+    const el_in_storage = uuidmap[uuid];
+    if (el_in_storage.signature === signature) {
+      // Same content
+      //  pass
+    } else {
+      // Different content
+      //  erase
+      const setname = el_in_storage.key;
+      remove_from_storage(element);
+      add_element_to_storage(element, setname);      
+    }
+  } else {
+    // Recursive search
+    for (const child of element.children) {
+      compare_uuid_one(child, uuidmap);
+    }
+  }
 }
-sign_all()
+async function compare_uuid() {
+  let uuidmap = {};
+  const storage = await chrome.storage.local.get(null);
+  for (elem in storage[document.URL]) {
+    if (storage[document.URL][elem].uuid) {
+      uuidmap[storage[document.URL][elem].uuid] = storage[document.URL][elem];
+    }
+  }
+
+  compare_uuid_one(document.body, uuidmap);
+}
+
+async function sign_all() {
+  await sign_one(document.body);
+}
+sign_all().then(
+  compare_uuid()
+)
 
 let keymap = {};
 async function update_storage_keymap() {
@@ -331,8 +368,13 @@ function remove_from_storage(element) {
 
   chrome.storage.local.get([document.URL], (result) => {
     const data = result[document.URL];
-    if (data && data[json_id] !== undefined) {
-      delete data[json_id];
+    if (data && Object.entries(data).find(([key, value]) => value.signature === json_id) !== undefined) {
+      const entry = Object.entries(data).find(([key, value]) => value.signature === json_id);
+      if (entry) {
+        const [key] = entry;
+        delete data[key];
+      }
+
       chrome.storage.local.set({ [document.URL]: data }, () => {
         console.log(`[CachableUI] Deleted ${json_id} from storage ${document.URL}`);
       });
@@ -361,12 +403,12 @@ async function remove_multiple_from_storage(elements) {
   });
 }
 
-function add_element_to_storage(element) {
+function add_element_to_storage(element, setname = null) {
   const rect_elem = element.getBoundingClientRect();
 
   const element_signature = element.getAttribute("data-cui-signature");
   const element_uuid = element.getAttribute("data-cui-uuid");
-  const element_key = element_uuid ? element_uuid : element_signature;
+  const element_key = setname ? setname : element_uuid ? element_uuid : element_signature;
   console.log("key is " + element_key);
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
@@ -442,4 +484,8 @@ function children_saved(element) {
   }
 
   return ret;
+}
+
+function replace_in_storage(element) {
+  // Replace in the local storage the element domJSON with its new content
 }

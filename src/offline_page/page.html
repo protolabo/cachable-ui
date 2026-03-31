@@ -2,418 +2,438 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline page</title>
 
-    <style>
-        body {
-            margin: 0;
-        }
+  <style>
+    body {
+      margin: 0;
+    }
 
-        #whole {
-            width: 100vw;
-            height: 100vh;
-            margin: 0%;
+    #whole {
+      width: 100vw;
+      height: 100vh;
+      margin: 0%;
 
-            background-size: cover;
-            background-repeat: no-repeat;
+      background-size: cover;
+      background-repeat: no-repeat;
 
-            position: relative;
-            z-index: 1;
-        }
+      position: relative;
+      z-index: 1;
+    }
 
-        #preview_container {
-            width: 100vw;
-            height: 100vh;
-            z-index: 2;
-            backdrop-filter: blur(2px);
-            background-color: rgba(0, 0, 0, 0.5);
-            position: absolute;
-            isolation: isolate;
-            /* background-color: rgba(0, 0, 0, 0.6) */
-        }
+    #preview_container {
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      backdrop-filter: blur(2px);
+      background-color: rgba(0, 0, 0, 0.5);
+      position: absolute;
+      isolation: isolate;
+      /* background-color: rgba(0, 0, 0, 0.6) */
+    }
 
-        .child_container {
-            background: transparent;
-        }
+    .child_container {
+      background: transparent;
+    }
 
-        #element_preview {
-            position: absolute;
-        }
+    #element_preview {
+      position: absolute;
+    }
 
-        #preview_container {
-            -webkit-mask-composite: destination-out;
-            -webkit-mask-repeat: no-repeat;
-            -webkit-mask-position: 0 0;
-            -webkit-mask-size: cover;
-            mask-composite: exclude;
-        }
+    #preview_container {
+      -webkit-mask-composite: destination-out;
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: 0 0;
+      -webkit-mask-size: cover;
+      mask-composite: exclude;
+    }
 
-        /* --- POPUP --- */
+    /* --- POPUP --- */
 
-#overlay_body {
-  border-radius: 8px;
-  /* height: 300px; */
-  width: 200px;
-  min-height: 200px;
-  background-color: #141020;
+    #overlay_body {
+      border-radius: 8px;
+      border: #b197fc solid 2px;
+      -webkit-user-select: none;
+      /* Safari */
+      -moz-user-select: none;
+      /* Firefox */
+      -ms-user-select: none;
+      /* IE 10+ */
+      user-select: none;
+      /* height: 300px; */
+      width: 200px;
+      min-height: 200px;
+      background-color: #141020;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 
-  padding: 16px;
+      padding: 16px;
 
-  position: fixed;
-  z-index: 10000;
-}
+      position: fixed;
+      z-index: 10000;
+    }
 
-#icon {
-  height: 50px;
-  width: 50px;
-}
+    #icon {
+      height: 50px;
+      width: 50px;
+    }
 
-#title {
-  color: #b197fc;
-}
+    #title {
+      color: #b197fc;
+    }
 
-#editor_button {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  color: #ffffff;
-  text-transform: uppercase;
-  font-weight: bold;
-}
+    #editor_button {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      color: #ffffff;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
 
-.fa {
-  margin-right: 16px;
-}
+    .fa {
+      margin-right: 16px;
+    }
 
-#elementstable {
-  color: #ffffff;
-  margin: 16px;
+    #elementstable {
+      color: #ffffff;
+      margin: 16px;
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-.elementstable-row {
-  border-bottom: 1px solid #ffffff;
-}
+    .elementstable-row {
+      border-bottom: 1px solid #ffffff;
+    }
 
-/* Source: https://www.w3schools.com/howto/howto_css_switch.asp */
-/* The switch - the box around the slider */
-.editor_switch {
-  position: relative;
-  display: inline-block;
-  width: 34px;
-  height: 21px;
-}
+    /* Source: https://www.w3schools.com/howto/howto_css_switch.asp */
+    /* The switch - the box around the slider */
+    .editor_switch {
+      position: relative;
+      display: inline-block;
+      width: 34px;
+      height: 21px;
+    }
 
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #4c3a81;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #4c3a81;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 13px;
-  width: 13px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 13px;
+      width: 13px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-input:checked+.slider {
-  background-color: #b197fc;
-}
+    input:checked+.slider {
+      background-color: #b197fc;
+    }
 
-input:focus+.slider {
-  box-shadow: 0 0 1px #b197fc;
-}
+    input:focus+.slider {
+      box-shadow: 0 0 1px #b197fc;
+    }
 
-input:checked+.slider:before {
-  -webkit-transform: translateX(13px);
-  -ms-transform: translateX(13px);
-  transform: translateX(13px);
-}
+    input:checked+.slider:before {
+      -webkit-transform: translateX(13px);
+      -ms-transform: translateX(13px);
+      transform: translateX(13px);
+    }
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 21px;
-}
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 21px;
+    }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+    .slider.round:before {
+      border-radius: 50%;
+    }
 
-.hline {
-  width: 100%;
-  height: 1px;
-  background-color: #b097fc8b;
-  margin: 16px;
-}
+    .hline {
+      width: 100%;
+      height: 1px;
+      background-color: #b097fc8b;
+      margin: 16px;
+    }
 
-#elements_list {
-  width: 100%;
-}
+    #elements_list {
+      width: 100%;
+    }
 
-.element_tile {
-  width: 100%;
-  /* background-color: #b097fc1b; */
-  border-radius: 4px;
-  color: #fff;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
+    .element_tile {
+      width: 100%;
+      /* background-color: #b097fc1b; */
+      border-radius: 4px;
+      color: #fff;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-.element_txt {
-  min-width: 0; 
-  flex: 1; 
-  margin-right: auto;
-  color: #fff;
-  background-color: transparent;
-  outline: none;
-  border: none;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  padding: 0;
-}
+    .element_txt {
+      min-width: 0;
+      flex: 1;
+      margin-right: auto;
+      color: #fff;
+      background-color: transparent;
+      outline: none;
+      border: none;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding: 0;
+    }
 
-.element_btn {
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  padding-bottom: 6px;
-}
+    .element_btn {
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      padding-bottom: 6px;
+    }
 
-.mdi_icon {
-  fill: #ffffffb4;
-  transition: fill 0.3s ease;
-}
+    .mdi_icon {
+      fill: #ffffffb4;
+      transition: fill 0.3s ease;
+    }
 
-.mdi_icon:hover {
-  fill: #ffffffde;
-}
+    .mdi_icon:hover {
+      fill: #ffffffde;
+    }
 
-.del_icon:hover {
-  fill: #ffb7b7b4;
-}
+    .del_icon:hover {
+      fill: #ffb7b7b4;
+    }
 
-/* From Uiverse.io by vinodjangid07 */
-#clear_button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #b097fc30;
-  border: none;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-  margin-top: 16px;
-  transition-duration: .3s;
-}
+    /* From Uiverse.io by vinodjangid07 */
+    #clear_button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #b097fc30;
+      border: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      margin-top: 16px;
+      transition-duration: .3s;
+    }
 
-#view_button {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #b097fc30;
-  border: none;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
-  cursor: pointer;
-  overflow: hidden;
-  position: relative;
-  margin-top: 16px;
-  transition-duration: .3s;
-}
+    #view_button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #b097fc30;
+      border: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      margin-top: 16px;
+      transition-duration: .3s;
+    }
 
-.clear_svg_icon {
-  width: 12px;
-  transition-duration: .3s;
-}
+    .clear_svg_icon {
+      width: 12px;
+      transition-duration: .3s;
+    }
 
-.view_svg_icon {
-  width: 12px;
-  transition-duration: .3s;
-}
+    .view_svg_icon {
+      width: 12px;
+      transition-duration: .3s;
+    }
 
-.clear_svg_icon path {
-  fill: white;
-  transition-duration: .3s;
-}
+    .clear_svg_icon path {
+      fill: white;
+      transition-duration: .3s;
+    }
 
-.view_svg_icon path {
-  fill: white;
-  transition-duration: .3s;
-}
+    .view_svg_icon path {
+      fill: white;
+      transition-duration: .3s;
+    }
 
-#clear_button:hover {
-  width: 140px;
-  border-radius: 50px;
-  transition-duration: .3s;
-  background-color: rgb(255, 69, 69);
-  align-items: center;
-}
+    #clear_button:hover {
+      width: 140px;
+      border-radius: 50px;
+      transition-duration: .3s;
+      background-color: rgb(255, 69, 69);
+      align-items: center;
+    }
 
-#view_button:hover {
-  width: 140px;
-  border-radius: 50px;
-  transition-duration: .3s;
-  background-color: rgb(78, 124, 233);
-  align-items: center;
-}
+    #view_button:hover {
+      width: 140px;
+      border-radius: 50px;
+      transition-duration: .3s;
+      background-color: rgb(78, 124, 233);
+      align-items: center;
+    }
 
-#clear_button:hover .clear_svg_icon {
-  width: 50px;
-  transition-duration: .3s;
-  transform: translateY(55%);
-}
+    #clear_button:hover .clear_svg_icon {
+      width: 50px;
+      transition-duration: .3s;
+      transform: translateY(55%);
+    }
 
-#view_button:hover .view_svg_icon {
-  width: 50px;
-  transition-duration: .3s;
-  transform: translateY(55%);
-}
+    #view_button:hover .view_svg_icon {
+      width: 50px;
+      transition-duration: .3s;
+      transform: translateY(55%);
+    }
 
-#clear_button::before {
-  position: absolute;
-  top: -20px;
-  content: "Vider le cache";
-  color: white;
-  transition-duration: .3s;
-  font-size: 2px;
-}
+    #clear_button::before {
+      position: absolute;
+      top: -20px;
+      content: "Vider le cache";
+      color: white;
+      transition-duration: .3s;
+      font-size: 2px;
+    }
 
-#view_button::before {
-  position: absolute;
-  top: -20px;
-  content: "Voir le cache";
-  color: white;
-  transition-duration: .3s;
-  font-size: 2px;
-}
+    #view_button::before {
+      position: absolute;
+      top: -20px;
+      content: "Voir le cache";
+      color: white;
+      transition-duration: .3s;
+      font-size: 2px;
+    }
 
-#clear_button:hover::before {
-  font-size: 13px;
-  opacity: 1;
-  transform: translateY(25px);
-  transition-duration: .3s;
-}
+    #clear_button:hover::before {
+      font-size: 13px;
+      opacity: 1;
+      transform: translateY(25px);
+      transition-duration: .3s;
+    }
 
-#view_button:hover::before {
-  font-size: 13px;
-  opacity: 1;
-  transform: translateY(25px);
-  transition-duration: .3s;
-}
+    #view_button:hover::before {
+      font-size: 13px;
+      opacity: 1;
+      transform: translateY(25px);
+      transition-duration: .3s;
+    }
 
-/**/
+    /**/
 
-#tab_div {
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  gap: 8px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 10px;
-  width: 100%;
-}
+    #tab_div {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      gap: 8px;
+      margin-left: 20px;
+      margin-right: 20px;
+      margin-bottom: 10px;
+      width: 100%;
+    }
 
-#tab_favicon {
-  height: 18px;
-}
+    #tab_favicon {
+      height: 18px;
+    }
 
-#tab_title {
-  color: #ffffffbb;
-  font-size: 14px;
-  font-weight: bold;
-  overflow: hidden;
-  max-lines: 1;
-  text-overflow: ellipsis;
-}
+    #tab_title {
+      color: #ffffffbb;
+      font-size: 14px;
+      font-weight: bold;
+      overflow: hidden;
+      max-lines: 1;
+      text-overflow: ellipsis;
+    }
 
-.no_child_label {
-  color: #fff;
-  font-size: 12px;
-  width: 100%;
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  padding-top: 32px;
-  padding-bottom: 32px;
-  display: flex;
-}
+    .no_child_label {
+      color: #fff;
+      font-size: 12px;
+      width: 100%;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      padding-top: 32px;
+      padding-bottom: 32px;
+      display: flex;
+    }
 
-#topbar {
-    color: #141020;
-    font-weight: bold;
-    width: 100%;
-    background-color: #ffffffaa;
-    height: 16px;
-    margin-bottom: 16px;
-    border-radius: 100vw;
-    text-align: center;
-}
+    #topbar {
+      color: #141020;
+      font-weight: bold;
+      width: 100%;
+      background-color: #b197fc;
+      height: 8px;
+      margin-bottom: 32px;
+      border-radius: 100vw;
+      text-align: center;
+    }
 
-    </style>
+    #desc {
+      color: #b097fcd6;
+      /* font-weight: bold; */
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .desc_reconnected {
+      color: #97fcb2fc;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div id="overlay_body">
-        <div id="topbar">DRAG TO MOVE</div>
-        <img id="icon" src="../res/icon.svg" alt="icon">
-        <h1 id="title">Cachable UI</h1>
-        <!-- <div id="buttons">
+  <div id="overlay_body">
+    <div id="topbar"></div>
+    <img id="icon" src="../res/icon.svg" alt="icon">
+    <h1 id="title">Cachable UI</h1>
+    <p id="desc"></p>
+    <!-- <div id="buttons">
     <button id="button_selec" type="button">
       <i class="fa fa-mouse-pointer"></i>Éditer
     </button>
   </div> -->
 
-        <!-- <div id="editor_button">
+    <!-- <div id="editor_button">
             <span>Mode édition</span>
             <label class="editor_switch">
                 <input id="editor_checkbox" type="checkbox">
@@ -421,14 +441,14 @@ input:checked+.slider:before {
             </label>
         </div> -->
 
-        <!-- <div class="hline"></div> -->
+    <!-- <div class="hline"></div> -->
 
-        <div id="tab_div">
-            <h2 id="tab_title"></h2>
-        </div>
+    <div id="tab_div">
+      <h2 id="tab_title"></h2>
+    </div>
 
-        <div id="elements_list">
-            <!-- <div class="element_tile">
+    <div id="elements_list">
+      <!-- <div class="element_tile">
       <span class="element_txt">element_id</span>
       <button class="element_btn">
         <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
@@ -447,18 +467,18 @@ input:checked+.slider:before {
         </svg>
       </button>
     </div> -->
-        </div>
+    </div>
 
-        <!-- From Uiverse.io by vinodjangid07 -->
-        <button id="clear_button">
-            <svg viewBox="0 0 448 512" class="clear_svg_icon">
-                <path
-                    d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
-                </path>
-            </svg>
-        </button>
+    <!-- From Uiverse.io by vinodjangid07 -->
+    <button id="clear_button">
+      <svg viewBox="0 0 448 512" class="clear_svg_icon">
+        <path
+          d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z">
+        </path>
+      </svg>
+    </button>
 
-        <!-- <button id="view_button">
+    <!-- <button id="view_button">
 
             <svg xmlns="http://www.w3.org/2000/svg" class="view_svg_icon"
                 viewBox="0 0 576 512">
@@ -466,14 +486,14 @@ input:checked+.slider:before {
                     d="M288 32c-80.8 0-145.5 36.8-192.6 80.6-46.8 43.5-78.1 95.4-93 131.1-3.3 7.9-3.3 16.7 0 24.6 14.9 35.7 46.2 87.7 93 131.1 47.1 43.7 111.8 80.6 192.6 80.6s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1 3.3-7.9 3.3-16.7 0-24.6-14.9-35.7-46.2-87.7-93-131.1-47.1-43.7-111.8-80.6-192.6-80.6zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64-11.5 0-22.3-3-31.7-8.4-1 10.9-.1 22.1 2.9 33.2 13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-12.2-45.7-55.5-74.8-101.1-70.8 5.3 9.3 8.4 20.1 8.4 31.7z" />
             </svg>
         </button> -->
-        </div>
+  </div>
 
-        <div id="whole">
-            <div id="preview_container"></div>
-        </div>
+  <div id="whole">
+    <div id="preview_container"></div>
+  </div>
 
-        <script src="../libs/domJSON.js"></script>
-        <script src="script.js"></script>
-    </body>
+  <script src="../libs/domJSON.js"></script>
+  <script src="script.js"></script>
+</body>
 
 </html>

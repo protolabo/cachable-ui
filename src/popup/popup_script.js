@@ -166,6 +166,7 @@ function view_element(element) {
   const params = new URLSearchParams();
   params.append("url", current_url);
   params.append("element", element);
+  params.append("redirect", false);
 
   chrome.tabs.create({
     url: `offline_page/page.html?${params.toString()}`
@@ -175,6 +176,7 @@ function view_element(element) {
 function view_elements() {
   const params = new URLSearchParams();
   params.append("url", current_url);
+  params.append("redirect", false);
 
   chrome.tabs.create({
     url: `offline_page/page.html?${params.toString()}`

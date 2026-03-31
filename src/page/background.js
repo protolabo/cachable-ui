@@ -244,6 +244,7 @@ chrome.webNavigation.onErrorOccurred.addListener(async (details) => {
         const current_url = await get_current_url();
         const params = new URLSearchParams();
         params.append("url", current_url);
+        params.append("redirect", true);
         chrome.tabs.update(details.tabId, {
             url: chrome.runtime.getURL(`offline_page/page.html?${params.toString()}`)
         });

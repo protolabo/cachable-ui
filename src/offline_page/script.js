@@ -1,78 +1,106 @@
 const params = new URLSearchParams(window.location.search);
 const element = params.get('element');
+const redirect = params.get('redirect');
 let url = params.get('url');
 
 if (!url) {
-    url = "blank"
+  url = "blank"
+}
+
+if (redirect === "true") {
+  document.getElementById("desc").textContent = "Vous êtes hors-ligne. Voici les éléments UI sauvé par Cachable UI:";
+} else {
+  document.getElementById("desc").textContent = "Voici les éléments UI sauvé par Cachable UI:";
 }
 
 chrome.storage.local.get([url], (result) => {
-    if (result[url]) {
-        if (element !== null && result[url][element]) {
-            const content = result[url][element].content;
-            const top = result[url][element].top;
-            const left = result[url][element].left;
+  if (result[url]) {
+    if (element !== null && result[url][element]) {
+      const content = result[url][element].content.at(-1).json;
+      const top = result[url][element].top;
+      const left = result[url][element].left;
 
-            const serialized_element = content;
-            const child = domJSON.toDOM(serialized_element);
-            document.getElementById("preview_container").replaceChildren(child);
-            document.getElementById("preview_container").firstChild.id = "element_preview";
-            apply_node(document.getElementById("element_preview"), serialized_element.node);
-            document.getElementById("element_preview").style.position = `absolute`;
-            document.getElementById("element_preview").style.left = `${left}px`;
-            document.getElementById("element_preview").style.top = `${top}px`;
-        } else {
-            for (key in result[url]) {
-                const content = result[url][key].content;
-                const top = result[url][key].top;
-                const left = result[url][key].left;
+      const serialized_element = content;
+      const child = domJSON.toDOM(serialized_element);
+      document.getElementById("preview_container").replaceChildren(child);
+      document.getElementById("preview_container").firstChild.id = "element_preview";
+      apply_node(document.getElementById("element_preview"), serialized_element.node);
+      document.getElementById("element_preview").style.position = `absolute`;
+      document.getElementById("element_preview").style.left = `${left}px`;
+      document.getElementById("element_preview").style.top = `${top}px`;
+    } else {
+      for (key in result[url]) {
+        const content = result[url][key].content.at(-1).json;
+        const top = result[url][key].top;
+        const left = result[url][key].left;
 
-                const serialized_element = content;
-                const child = domJSON.toDOM(serialized_element);
-                const child_container = document.createElement("div");
-                child_container.classList.add("child_container");
-                child_container.appendChild(child);
-                document.getElementById("preview_container").appendChild(child_container);
-                child_container.lastChild.id = `element_preview_${key}`;
-                apply_node(document.getElementById(`element_preview_${key}`), serialized_element.node);
-                child_container.style.position = `absolute`;
-                child_container.style.left = `${left}px`;
-                child_container.style.top = `${top}px`;
-                child_container.firstChild.style.margin = "0";
-                // document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
-            }
-        }
+        const serialized_element = content;
+        const child = domJSON.toDOM(serialized_element);
+        const child_container = document.createElement("div");
+        child_container.classList.add("child_container");
+        child_container.appendChild(child);
+        document.getElementById("preview_container").appendChild(child_container);
+        child_container.lastChild.id = `element_preview_${key}`;
+        apply_node(document.getElementById(`element_preview_${key}`), serialized_element.node);
+        child_container.style.position = `absolute`;
+        child_container.style.left = `${left}px`;
+        child_container.style.top = `${top}px`;
+        child_container.firstChild.style.margin = "0";
+        // document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
+      }
     }
+  }
 });
 
+// function apply_node(node, json) {
+//     Object.entries(json.style).forEach(([property, value]) => {
+//         node.style[property] = value;
+//     });
+// }
+
 function apply_node(node, json) {
+  //console.log("APPLY NODE FOR: " + JSON.stringify(json));
+  if (json && json.style) {
+    const n_children = (!json.childNodes || !node.childNodes) ? 0 : json.childNodes < node.childNodes.length ? json.childNodes.length : node.childNodes.length;
     Object.entries(json.style).forEach(([property, value]) => {
-        node.style[property] = value;
+      node.style[property] = value;
     });
+
+    for (let i = 0; i < n_children; ++i) {
+      apply_node(node.childNodes[i], json.childNodes[i]);
+    }
+  }
 }
 
 async function get_bg() {
-    // const key = (element !== null) ? element : "blank";
-    try {
-        const img = await chrome.runtime.sendMessage({
-            type: "GET_SCREENSHOT",
-            id: url
-        });
-        // console.log("ret is: " + JSON.stringify(img));
-        // console.log("img is " + img.image);
-        document.getElementById("whole").style.backgroundImage = `url('${img.image}')`;
-    } catch (err) {
-        console.error("Error:", err);
-    }
+  // const key = (element !== null) ? element : "blank";
+  try {
+    const img = await chrome.runtime.sendMessage({
+      type: "GET_SCREENSHOT",
+      id: url
+    });
+    // console.log("ret is: " + JSON.stringify(img));
+    // console.log("img is " + img.image);
+    document.getElementById("whole").style.backgroundImage = `url('${img.image}')`;
+  } catch (err) {
+    console.error("Error:", err);
+  }
 }
 
 get_bg()
 
 window.addEventListener('online', () => {
+  if (redirect) {
     console.log("[CachableUI] The connection is back");
+    document.getElementById("desc").style.color = "#97fcb2fc";
+    document.getElementById("desc").textContent = "";
+    document.getElementById("desc").innerHTML = "<strong>Connexion rétablie</strong>\nChargement...";
+
+
     setTimeout(() => {
-        window.location.assign(url);
-    }, 500);
+      window.location.assign(url);
+    }, 2500);
+  }
 });
 
 function update_elements_list(storage) {
@@ -90,6 +118,14 @@ function update_elements_list(storage) {
       document.getElementById("erase_elem_" + value.key).addEventListener("click", () => {
         erase_from_storage(value.key);
       })
+      document.getElementById("input_" + value.key).addEventListener("change", (e) => {
+        const oldKey = e.target.getAttribute("data-cui-key");
+        const newKey = e.target.value;
+
+        if (oldKey && newKey !== oldKey) {
+          changeKeyOf(oldKey, newKey);
+        }
+      });
     });
   }
   if (ui_list.childElementCount == 0) {
@@ -106,11 +142,19 @@ function update_elements_list(storage) {
 function gen_html_for_tile(json) {
   let displayed_key = json.key;
   if (json.key === json.signature) {
-  const id_list = json.key.split("_");
+    const id_list = json.key.split("_");
     displayed_key = `${id_list[3]}  x:${Math.ceil(parseFloat(id_list[1]))} y:${Math.ceil(parseFloat(id_list[2]))} ${id_list[4]}`;
   }
 
-  return `<input type="text" class="element_txt" value="${displayed_key}"/>
+  return `<input type="text" class="element_txt" value="${displayed_key}" data-cui-key="${json.key}" id="input_${json.key}"/>
+      <button class="element_btn" id="view_elem_${json.key}">
+        <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
+          width="16" height="16">
+          <title>view</title>
+          <path
+            d="M288 32c-80.8 0-145.5 36.8-192.6 80.6-46.8 43.5-78.1 95.4-93 131.1-3.3 7.9-3.3 16.7 0 24.6 14.9 35.7 46.2 87.7 93 131.1 47.1 43.7 111.8 80.6 192.6 80.6s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1 3.3-7.9 3.3-16.7 0-24.6-14.9-35.7-46.2-87.7-93-131.1-47.1-43.7-111.8-80.6-192.6-80.6zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64-11.5 0-22.3-3-31.7-8.4-1 10.9-.1 22.1 2.9 33.2 13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-12.2-45.7-55.5-74.8-101.1-70.8 5.3 9.3 8.4 20.1 8.4 31.7z"/>
+        </svg>
+      </button>
       <button class="element_btn" id="erase_elem_${json.key}">
         <svg class="mdi_icon del_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
           width="16" height="16">
@@ -166,5 +210,23 @@ function erase_from_storage(element) {
         window.location.reload();
       });
     }
+  });
+}
+
+function changeKeyOf(oldKey, newKey) {
+  console.log("renaming: " + oldKey + " into " + newKey)
+  chrome.storage.local.get([url], (result) => {
+    const data = result[url];
+
+    if (!data || !(oldKey in data)) return;
+
+    data[newKey] = data[oldKey];
+    data[newKey].key = newKey;
+
+    delete data[oldKey];
+
+    chrome.storage.local.set({ [url]: data }, () => {
+      console.log("Key renamed");
+    });
   });
 }

@@ -50,7 +50,7 @@ async function sign_one(element) {
 function compare_uuid_one(element, uuidmap) {
   const signature = element.getAttribute("data-cui-signature");
   const uuid = element.getAttribute("data-cui-uuid");
-  if (uuid !== null && uuidmap.contains(uuid)) {
+  if (uuid !== null && uuid in uuidmap) {
     // Same element
     const el_in_storage = uuidmap[uuid];
     if (el_in_storage.signature === signature) {
@@ -60,8 +60,9 @@ function compare_uuid_one(element, uuidmap) {
       // Different content
       //  erase
       const setname = el_in_storage.key;
-      remove_from_storage(element);
-      add_element_to_storage(element, setname);      
+      add_version_to_storage(element, setname);
+      // remove_from_storage(element);
+      // add_element_to_storage(element, setname);
     }
   } else {
     // Recursive search
@@ -152,6 +153,10 @@ function remove_box_from_overlay(element) {
 }
 
 function add_box_to_overlay(element, type) {
+  if (!document.getElementById("i_cachableui_overlay_second")) {
+    return;
+  }
+
   let box_class = "none";
   if (type == "saved") {
     box_class = "box_saved";
@@ -409,7 +414,6 @@ function add_element_to_storage(element, setname = null) {
   const element_signature = element.getAttribute("data-cui-signature");
   const element_uuid = element.getAttribute("data-cui-uuid");
   const element_key = setname ? setname : element_uuid ? element_uuid : element_signature;
-  console.log("key is " + element_key);
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
   });
@@ -417,9 +421,14 @@ function add_element_to_storage(element, setname = null) {
     key: element_key,
     signature: element_signature,
     uuid: element_uuid,
-    content: element_as_string,
+    content: [
+      {
+        json: element_as_string,
+        date: Date.now()
+      }
+    ],
     top: rect_elem.top + window.scrollY,
-    left: rect_elem.left + + window.scrollX,
+    left: rect_elem.left + window.scrollX,
   };
 
   chrome.storage.local.get([document.URL], (result) => {
@@ -486,6 +495,27 @@ function children_saved(element) {
   return ret;
 }
 
-function replace_in_storage(element) {
-  // Replace in the local storage the element domJSON with its new content
+function add_version_to_storage(element, setname) {
+  const now = Date.now();
+  const element_as_string = domJSON.toJSON(element, {
+    computedStyle: true
+  });
+
+  console.log("adding version to: " + setname);
+  chrome.storage.local.get([document.URL], (result) => {
+    const data = result[document.URL];
+
+    if (!data || !(setname in data)) return;
+
+    data[setname].signature = element.getAttribute("data-cui-signature");
+    data[setname].content.push({
+      json: element_as_string,
+      date: now
+    });
+
+    chrome.storage.local.set({ [document.URL]: data }, () => {
+      console.log("Version added (total of: " + data[setname].content.length + " versions)");
+    });
+  });
+
 }

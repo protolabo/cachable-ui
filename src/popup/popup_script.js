@@ -18,7 +18,7 @@ editor_checkbox.addEventListener('change', () => {
 });
 
 clear_button.addEventListener('click', () => {
-  chrome.runtime.sendMessage({type: "CLEAR_ALL"});
+  chrome.runtime.sendMessage({ type: "CLEAR_ALL" });
   chrome.storage.local.remove(current_url, () => {
     console.log("[CachableUI] All elements removed from cache");
   });
@@ -70,6 +70,15 @@ function update_elements_list(storage) {
       document.getElementById("view_elem_" + value.key).addEventListener("click", () => {
         view_element(value.key);
       })
+      document.getElementById("input_" + value.key).addEventListener("change", (e) => {
+        const oldKey = e.target.getAttribute("data-cui-key");
+        const newKey = e.target.value;
+
+        if (oldKey && newKey !== oldKey) {
+          changeKeyOf(oldKey, newKey);
+        }
+      });
+
     });
   }
   if (ui_list.childElementCount == 0) {
@@ -88,11 +97,11 @@ function update_elements_list(storage) {
 function gen_html_for_tile(json) {
   let displayed_key = json.key;
   if (json.key === json.signature) {
-  const id_list = json.key.split("_");
+    const id_list = json.key.split("_");
     displayed_key = `${id_list[3]}  x:${Math.ceil(parseFloat(id_list[1]))} y:${Math.ceil(parseFloat(id_list[2]))} ${id_list[4]}`;
   }
 
-  return `<input type="text" class="element_txt" value="${displayed_key}"/>
+  return `<input type="text" class="element_txt" value="${displayed_key}" data-cui-key="${json.key}" id="input_${json.key}"/>
       <button class="element_btn" id="view_elem_${json.key}">
         <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
           width="16" height="16">
@@ -169,5 +178,23 @@ function view_elements() {
 
   chrome.tabs.create({
     url: `offline_page/page.html?${params.toString()}`
+  });
+}
+
+function changeKeyOf(oldKey, newKey) {
+  console.log("renaming: " + oldKey + " into " + newKey)
+  chrome.storage.local.get([current_url], (result) => {
+    const data = result[current_url];
+
+    if (!data || !(oldKey in data)) return;
+
+    data[newKey] = data[oldKey];
+    data[newKey].key = newKey;
+
+    delete data[oldKey];
+
+    chrome.storage.local.set({ [current_url]: data }, () => {
+      console.log("Key renamed");
+    });
   });
 }

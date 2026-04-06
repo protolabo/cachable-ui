@@ -363,7 +363,7 @@ window.onclick = async function (event) {
     }
     return false;
   }
-  return true;
+  return false;
 };
 
 // IO OPERATIONS

@@ -4,11 +4,19 @@ const tab_favicon = document.getElementById("tab_favicon");
 const clear_button = document.getElementById("clear_button");
 const view_button = document.getElementById("view_button");
 const clear_icon = document.getElementById("clear_svg_icon");
+const dashboard_button = document.getElementById("dashboard_button");
 
 let current_domain = "blank";
 let current_url = "blank";
 let current_title = "blank";
 let current_favicon = "blank";
+
+dashboard_button.addEventListener('click', () => {
+    chrome.tabs.create({
+    url: `dashboard/board.html`
+  });
+}
+)
 
 editor_checkbox.addEventListener('change', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {

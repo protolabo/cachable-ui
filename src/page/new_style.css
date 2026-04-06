@@ -14,14 +14,14 @@
   background-color: #9f7fff87;
   outline: #8666e4 dashed 2px;
   position: absolute;
-  z-index: 1001;
+  z-index: 1000001;
 }
 
 .box_saved {
   background-color: #76d8bea3;
   outline: #61e3a2 solid 2px;
   position: absolute;
-  z-index: 1002;
+  z-index: 1000002;
 }
 
 .svg_saved {

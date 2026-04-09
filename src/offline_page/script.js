@@ -10,6 +10,7 @@ if (!url) {
 
 if (redirect === "true") {
   document.getElementById("desc").textContent = "Vous êtes hors-ligne. Voici les éléments UI sauvés par Cachable UI:";
+  document.getElementById("icon").src = "../res/offline.svg";
 } else {
   document.getElementById("desc").textContent = "Voici les éléments UI sauvés par Cachable UI:";
 }
@@ -24,12 +25,12 @@ function downloadDataURL(dataURL, filename = "image.jpg") {
     a.click();
 }
 
-chrome.storage.local.get([url], (result) => {
-  if (result[url]) {
-    if (element !== null && result[url][element]) {
-      const content = result[url][element].content.at(-1).json;
-      const top = result[url][element].top;
-      const left = result[url][element].left;
+chrome.storage.local.get("elements", (result) => {
+  if (result.elements[url]) {
+    if (element !== null && result.elements[url][element]) {
+      const content = result.elements[url][element].content.at(-1).json;
+      const top = result.elements[url][element].top;
+      const left = result.elements[url][element].left;
 
       const serialized_element = content;
       const child = domJSON.toDOM(serialized_element);
@@ -40,11 +41,12 @@ chrome.storage.local.get([url], (result) => {
       document.getElementById("element_preview").style.left = `${left}px`;
       document.getElementById("element_preview").style.top = `${top}px`;
       document.getElementById("element_preview").style.margin = `0`;
+      recu_apply_custom_src(child_container.lastChild);
     } else {
-      for (key in result[url]) {
-        const content = result[url][key].content.at(-1).json;
-        const top = result[url][key].top;
-        const left = result[url][key].left;
+      for (key in result.elements[url]) {
+        const content = result.elements[url][key].content.at(-1).json;
+        const top = result.elements[url][key].top;
+        const left = result.elements[url][key].left;
 
         const serialized_element = content;
         const child = domJSON.toDOM(serialized_element);
@@ -59,8 +61,6 @@ chrome.storage.local.get([url], (result) => {
         child_container.style.top = `${top}px`;
         child_container.firstChild.style.margin = "0";
         recu_apply_custom_src(child_container.lastChild);
-        // console.log(child_container.lastChild);
-        // console.log(child_container.lastChild.getAttribute("data-cui-signature"));
       }
     }
   }
@@ -120,9 +120,13 @@ get_bg()
 window.addEventListener('online', () => {
   if (redirect) {
     console.log("[CachableUI] The connection is back");
+
+    document.getElementById("icon").classList.add("blinking_img");
     document.getElementById("desc").style.color = "#97fcb2fc";
+    document.getElementById("title").style.color = "#97fcb2fc";
     document.getElementById("desc").textContent = "";
     document.getElementById("desc").innerHTML = "<strong>Connexion rétablie</strong>\nChargement...";
+    document.getElementById("icon").src = "../res/online.svg";
 
 
     setTimeout(() => {
@@ -135,10 +139,8 @@ function update_elements_list(storage) {
   let ui_list = document.getElementById("elements_list");
   ui_list.replaceChildren(); // Clear
 
-  if (storage[url] != null && storage[url] != undefined) {
-    Object.entries(storage[url]).forEach(([key, value]) => {
-      console.log("Adding tile for " + key);
-
+  if (storage.elements[url] != null && storage.elements[url] != undefined) {
+    Object.entries(storage.elements[url]).forEach(([key, value]) => {
       let child = document.createElement("div");
       child.classList.add("element_tile");
       child.innerHTML = gen_html_for_tile(value);
@@ -220,14 +222,27 @@ function onMouseUp() {
 }
 
 function erase_from_storage(element) {
-  chrome.storage.local.get(url, (result) => {
-    if (result[url]) {
-      const new_data = result[url];
-      delete new_data[element];
+  // chrome.storage.local.get(current_url, (result) => {
+  //   if (result[current_url]) {
+  //     const new_data = result[current_url];
+  //     delete new_data[element];
 
-      chrome.storage.local.set({ [url]: new_data }, () => {
+  //     chrome.storage.local.set({ [current_url]: new_data }, () => {
+  //       console.log('Element removed from cache');
+  //     });
+  //   }
+  // });
+
+  chrome.storage.local.get("elements", (result) => {
+    if (result.elements[current_url]) {
+      const new_elements = result.elements || {};
+      const new_data = new_elements[current_url];
+      if (new_data) {
+        delete new_data[element];
+      }
+
+      chrome.storage.local.set({ "elements": new_elements }, () => {
         console.log('Element removed from cache');
-        window.location.reload();
       });
     }
   });
@@ -235,8 +250,9 @@ function erase_from_storage(element) {
 
 function changeKeyOf(oldKey, newKey) {
   console.log("renaming: " + oldKey + " into " + newKey)
-  chrome.storage.local.get([url], (result) => {
-    const data = result[url];
+  chrome.storage.local.get("elements", (result) => {
+    const elements = result.elements || {};
+    const data = elements[current_url];
 
     if (!data || !(oldKey in data)) return;
 
@@ -245,17 +261,24 @@ function changeKeyOf(oldKey, newKey) {
 
     delete data[oldKey];
 
-    chrome.storage.local.set({ [url]: data }, () => {
+    chrome.storage.local.set({ "elements": elements }, () => {
       console.log("Key renamed");
     });
   });
 }
 
 clear_button.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: "CLEAR_ALL" });
-    chrome.storage.local.remove(url, () => {
+  chrome.runtime.sendMessage({ type: "CLEAR_ALL" });
+  chrome.storage.local.get("elements", (result) => {
+    if (result.elements[current_url]) {
+      const new_elements = result.elements || {};
+      delete new_elements[current_url];
+
+      chrome.storage.local.set({ "elements": new_elements }, () => {
         console.log("[CachableUI] All elements removed from cache");
-    });
+      });
+    }
+  });
 });
 
 function downloadBlob(blob, filename = "file.jpg") {

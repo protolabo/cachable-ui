@@ -74,9 +74,9 @@ function compare_uuid_one(element, uuidmap) {
 async function compare_uuid() {
   let uuidmap = {};
   const storage = await chrome.storage.local.get(null);
-  for (elem in storage[document.URL]) {
-    if (storage[document.URL][elem].uuid) {
-      uuidmap[storage[document.URL][elem].uuid] = storage[document.URL][elem];
+  for (elem in storage.elements[document.URL]) {
+    if (storage.elements[document.URL][elem].uuid) {
+      uuidmap[storage.elements[document.URL][elem].uuid] = storage.elements[document.URL][elem];
     }
   }
 
@@ -94,8 +94,8 @@ let keymap = {};
 async function update_storage_keymap() {
   keymap = {};
   const storage = await chrome.storage.local.get(null);
-  for (elem in storage[document.URL]) {
-    keymap[storage[document.URL][elem].signature] = true;
+  for (elem in storage.elements[document.URL]) {
+    keymap[storage.elements[document.URL][elem].signature] = true;
   }
 }
 update_storage_keymap();
@@ -385,8 +385,9 @@ window.onclick = async function (event) {
 function remove_from_storage(element) {
   let json_id = element.getAttribute("data-cui-signature");
 
-  chrome.storage.local.get([document.URL], (result) => {
-    const data = result[document.URL];
+  chrome.storage.local.get("elements", (result) => {
+    const elements = result.elements || {};
+    const data = elements[document.URL];
     if (data && Object.entries(data).find(([key, value]) => value.signature === json_id) !== undefined) {
       const entry = Object.entries(data).find(([key, value]) => value.signature === json_id);
       if (entry) {
@@ -394,7 +395,7 @@ function remove_from_storage(element) {
         delete data[key];
       }
 
-      chrome.storage.local.set({ [document.URL]: data }, () => {
+      chrome.storage.local.set({ "elements": elements }, () => {
         console.log(`[CachableUI] Deleted ${json_id} from storage ${document.URL}`);
       });
     }
@@ -406,8 +407,10 @@ async function remove_multiple_from_storage(elements) {
     return;
   }
 
-  await chrome.storage.local.get([document.URL]).then((result) => {
-    const data = result[document.URL];
+  await chrome.storage.local.get("elements").then((result) => {
+    const elements = result.elements || {};
+    const data = elements[document.URL];
+
 
     for (const element of elements) {
       let json_id = element.getAttribute("data-cui-signature");
@@ -416,7 +419,7 @@ async function remove_multiple_from_storage(elements) {
       }
     }
 
-    chrome.storage.local.set({ [document.URL]: data }, () => {
+    chrome.storage.local.set({ "elements": elements }, () => {
       console.log(`[CachableUI] Deleted multiple from storage ${document.URL}`);
     });
   });
@@ -433,7 +436,6 @@ async function add_element_to_storage(element, setname = null) {
   });
   remove_default_style(element_as_string.node);
   await download_src_href(element_as_string.node);
-  show_recu(element_as_string.node)
 
   const data_to_save = {
     key: element_key,
@@ -449,10 +451,14 @@ async function add_element_to_storage(element, setname = null) {
     left: rect_elem.left + window.scrollX,
   };
 
-  chrome.storage.local.get([document.URL], (result) => {
-    let current_cache = result[document.URL] || {};
-    current_cache[element_key] = data_to_save;
-    chrome.storage.local.set({ [document.URL]: current_cache }, () => {
+  chrome.storage.local.get("elements", (result) => {
+    let elements = result.elements || {};
+    if (!elements[document.URL]) {
+      elements[document.URL] = {};
+    }
+    let data = elements[document.URL];
+    data[element_key] = data_to_save;
+    chrome.storage.local.set({ "elements": elements }, () => {
       console.log("[CachableUI] Save to database: " + element_key);
     });
   });
@@ -520,8 +526,10 @@ function add_version_to_storage(element, setname) {
   });
 
   console.log("adding version to: " + setname);
-  chrome.storage.local.get([document.URL], (result) => {
-    const data = result[document.URL];
+  chrome.storage.local.get("elements", (result) => {
+    const elements = result.elements || {};
+    const data = elements[document.URL];
+
 
     if (!data || !(setname in data)) return;
 
@@ -531,7 +539,7 @@ function add_version_to_storage(element, setname) {
       date: now
     });
 
-    chrome.storage.local.set({ [document.URL]: data }, () => {
+    chrome.storage.local.set({ "elements": elements }, () => {
       console.log("Version added (total of: " + data[setname].content.length + " versions)");
     });
   });
@@ -600,3 +608,69 @@ function show_recu(node_json) {
     }
   }
 }
+
+// Set the page data in storage.local.pages
+async function save_page_metadata() {
+  // Viewport height
+  // Url
+  // Title
+  // Favicon
+  // Last visisted
+
+  const favicon_url = getFaviconUrl() || getDefaultFavicon();
+  let favicon_dataUrl = null;
+  if (favicon_url) {
+    favicon_dataUrl = await faviconToDataUrl(favicon_url);
+  }
+  const fullHeight = Math.max(
+    document.body.scrollHeight,
+    document.documentElement.scrollHeight,
+    document.body.offsetHeight,
+    document.documentElement.offsetHeight,
+    document.documentElement.clientHeight
+  );
+  const data_to_save = {
+    "favicon": favicon_dataUrl,
+    "title": document.title,
+    "vh": fullHeight,
+    "url": window.location.href,
+    "timestamp": Date.now()
+  }
+  console.log("[CachableUI] Page metadata: " + JSON.stringify(data_to_save));
+
+  const storage = await chrome.storage.local.get("pages");
+  if (!storage.pages) {
+    storage.pages = {};
+  }
+  let pages = storage.pages;
+  pages[window.location.href] = data_to_save;
+  chrome.storage.local.set({ "pages": pages }, () => {
+    console.log(`[CachableUI] Update page metadata for ${window.location.href}`);
+  });
+}
+
+async function faviconToDataUrl(url) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.error('Failed to fetch favicon:', e);
+    return null;
+  }
+}
+
+function getFaviconUrl() {
+  const links = document.querySelectorAll('link[rel*="icon"]');
+  for (const link of links) {
+    if (link.href) return link.href;
+  }
+  return null;
+}
+
+save_page_metadata()

@@ -334,7 +334,7 @@ async function captureFullPage(tabId) {
             y: scrollY
         });
 
-        await new Promise(r => setTimeout(r, 3000)); // wait for render
+        await new Promise(r => setTimeout(r, 1000)); // wait for render
 
         const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
             format: "jpeg",

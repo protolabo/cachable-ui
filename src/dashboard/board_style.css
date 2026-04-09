@@ -1,0 +1,4 @@
+.dual_tile_div {
+    display: flex;
+    flex-direction: column;
+}

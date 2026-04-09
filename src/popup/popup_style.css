@@ -2,7 +2,7 @@
 
 body {
   /* height: 300px; */
-  width: 200px;
+  width: 300px;
   min-height: 200px;
   background-color: #141020;
 
@@ -15,12 +15,13 @@ body {
 }
 
 #icon {
-  height: 50px;
-  width: 50px;
+  height: 70px;
+  width: 70px;
 }
 
 #title {
   color: #b197fc;
+  font-size: 30px;
 }
 
 #editor_button {
@@ -32,6 +33,7 @@ body {
   color: #ffffff;
   text-transform: uppercase;
   font-weight: bold;
+  font-size: 15px;
 }
 
 .fa {
@@ -149,6 +151,7 @@ input:checked+.slider:before {
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 0;
+  font-size: 15px;
 }
 
 .element_btn {
@@ -227,7 +230,7 @@ input:checked+.slider:before {
 }
 
 .dashboard_svg_icon {
-  width: 12px;
+  width: 20px;
   transition-duration: .3s;
 }
 
@@ -334,12 +337,12 @@ input:checked+.slider:before {
 }
 
 #tab_favicon {
-  height: 18px;
+  height: 20px;
 }
 
 #tab_title {
   color: #ffffffbb;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: bold;
   overflow: hidden;
   max-lines: 1;
@@ -348,7 +351,7 @@ input:checked+.slider:before {
 
 .no_child_label {
   color: #fff;
-  font-size: 12px;
+  font-size: 15px;
   width: 100%;
   text-align: center;
   align-items: center;

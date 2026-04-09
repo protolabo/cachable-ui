@@ -12,7 +12,7 @@ let current_title = "blank";
 let current_favicon = "blank";
 
 dashboard_button.addEventListener('click', () => {
-    chrome.tabs.create({
+  chrome.tabs.create({
     url: `dashboard/board.html`
   });
 }
@@ -27,8 +27,15 @@ editor_checkbox.addEventListener('change', () => {
 
 clear_button.addEventListener('click', () => {
   chrome.runtime.sendMessage({ type: "CLEAR_ALL" });
-  chrome.storage.local.remove(current_url, () => {
-    console.log("[CachableUI] All elements removed from cache");
+  chrome.storage.local.get("elements", (result) => {
+    if (result.elements[current_url]) {
+      const new_elements = result.elements || {};
+      delete new_elements[current_url];
+
+      chrome.storage.local.set({ "elements": new_elements }, () => {
+        console.log("[CachableUI] All elements removed from cache");
+      });
+    }
   });
 });
 
@@ -64,8 +71,8 @@ function update_elements_list(storage) {
   let ui_list = document.getElementById("elements_list");
   ui_list.replaceChildren(); // Clear
 
-  if (storage[current_url] != null && storage[current_url] != undefined) {
-    Object.entries(storage[current_url]).forEach(([key, value]) => {
+  if (storage.elements[current_url] != null && storage.elements[current_url] != undefined) {
+    Object.entries(storage.elements[current_url]).forEach(([key, value]) => {
       console.log("Adding tile for " + key);
 
       let child = document.createElement("div");
@@ -91,7 +98,7 @@ function update_elements_list(storage) {
   }
   if (ui_list.childElementCount == 0) {
     let no_child_label = document.createElement("span");
-    no_child_label.textContent = "aucun élément dans le cache";
+    no_child_label.textContent = "aucun élément dans l'archive de la page";
     no_child_label.classList.add("no_child_label");
     ui_list.appendChild(no_child_label);
     clear_button.style.display = "none";
@@ -158,12 +165,26 @@ get_current_tab_info((title, icon, domain, url) => {
 });
 
 function erase_from_storage(element) {
-  chrome.storage.local.get(current_url, (result) => {
-    if (result[current_url]) {
-      const new_data = result[current_url];
-      delete new_data[element];
+  // chrome.storage.local.get(current_url, (result) => {
+  //   if (result[current_url]) {
+  //     const new_data = result[current_url];
+  //     delete new_data[element];
 
-      chrome.storage.local.set({ [current_url]: new_data }, () => {
+  //     chrome.storage.local.set({ [current_url]: new_data }, () => {
+  //       console.log('Element removed from cache');
+  //     });
+  //   }
+  // });
+
+  chrome.storage.local.get("elements", (result) => {
+    if (result.elements[current_url]) {
+      const new_elements = result.elements || {};
+      const new_data = new_elements[current_url];
+      if (new_data) {
+        delete new_data[element];
+      }
+
+      chrome.storage.local.set({ "elements": new_elements }, () => {
         console.log('Element removed from cache');
       });
     }
@@ -193,8 +214,9 @@ function view_elements() {
 
 function changeKeyOf(oldKey, newKey) {
   console.log("renaming: " + oldKey + " into " + newKey)
-  chrome.storage.local.get([current_url], (result) => {
-    const data = result[current_url];
+  chrome.storage.local.get("elements", (result) => {
+    const elements = result.elements || {};
+    const data = elements[current_url];
 
     if (!data || !(oldKey in data)) return;
 
@@ -203,7 +225,7 @@ function changeKeyOf(oldKey, newKey) {
 
     delete data[oldKey];
 
-    chrome.storage.local.set({ [current_url]: data }, () => {
+    chrome.storage.local.set({ "elements": elements }, () => {
       console.log("Key renamed");
     });
   });

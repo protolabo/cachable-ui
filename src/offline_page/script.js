@@ -39,6 +39,7 @@ chrome.storage.local.get([url], (result) => {
       document.getElementById("element_preview").style.position = `absolute`;
       document.getElementById("element_preview").style.left = `${left}px`;
       document.getElementById("element_preview").style.top = `${top}px`;
+      document.getElementById("element_preview").style.margin = `0`;
     } else {
       for (key in result[url]) {
         const content = result[url][key].content.at(-1).json;
@@ -57,17 +58,13 @@ chrome.storage.local.get([url], (result) => {
         child_container.style.left = `${left}px`;
         child_container.style.top = `${top}px`;
         child_container.firstChild.style.margin = "0";
-        // document.getElementById(`element_preview_${key}`).style.outline = `white 1px dashed`;
+        recu_apply_custom_src(child_container.lastChild);
+        // console.log(child_container.lastChild);
+        // console.log(child_container.lastChild.getAttribute("data-cui-signature"));
       }
     }
   }
 });
-
-// function apply_node(node, json) {
-//     Object.entries(json.style).forEach(([property, value]) => {
-//         node.style[property] = value;
-//     });
-// }
 
 function apply_node(node, json) {
   //console.log("APPLY NODE FOR: " + JSON.stringify(json));
@@ -83,17 +80,35 @@ function apply_node(node, json) {
   }
 }
 
+async function recu_apply_custom_src(node) {
+  if (node.childNodes) {
+    for (const child of node.childNodes) {
+      recu_apply_custom_src(child);
+    }
+  }
+
+  if (node.nodeType !== 1) {
+    return
+  }
+
+  if (node.getAttribute("data-cui-src-override")) {
+    const dataUrl = (await chrome.runtime.sendMessage({
+      type: "GET_FILE",
+      id: node.getAttribute("data-cui-src-override")
+    })).image;
+
+    if (dataUrl) {
+      node.src = dataUrl;
+    }
+  }
+}
+
 async function get_bg() {
-  // const key = (element !== null) ? element : "blank";
   try {
-    console.log("send a get screenshot request");
     const img = await chrome.runtime.sendMessage({
       type: "GET_SCREENSHOT",
       id: url
     });
-    // console.log("ret is: " + JSON.stringify(img));
-    //downloadDataURL(img.image);
-    // console.log("img is " + img.image);
     document.getElementById("whole").style.backgroundImage = `url('${img.image}')`;
   } catch (err) {
     console.error("Error:", err);
@@ -160,14 +175,6 @@ function gen_html_for_tile(json) {
   }
 
   return `<input type="text" class="element_txt" value="${displayed_key}" data-cui-key="${json.key}" id="input_${json.key}"/>
-      <button class="element_btn" id="view_elem_${json.key}">
-        <svg class="mdi_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
-          width="16" height="16">
-          <title>view</title>
-          <path
-            d="M288 32c-80.8 0-145.5 36.8-192.6 80.6-46.8 43.5-78.1 95.4-93 131.1-3.3 7.9-3.3 16.7 0 24.6 14.9 35.7 46.2 87.7 93 131.1 47.1 43.7 111.8 80.6 192.6 80.6s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1 3.3-7.9 3.3-16.7 0-24.6-14.9-35.7-46.2-87.7-93-131.1-47.1-43.7-111.8-80.6-192.6-80.6zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64-11.5 0-22.3-3-31.7-8.4-1 10.9-.1 22.1 2.9 33.2 13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-12.2-45.7-55.5-74.8-101.1-70.8 5.3 9.3 8.4 20.1 8.4 31.7z"/>
-        </svg>
-      </button>
       <button class="element_btn" id="erase_elem_${json.key}">
         <svg class="mdi_icon del_icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
           width="16" height="16">

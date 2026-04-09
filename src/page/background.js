@@ -1,24 +1,4 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    // if (message.type === "GET_SCREENSHOT") {
-    //     console.log("[CachableUI DB] Reveived a GET request");
-    //     getScreenshot(message.id)
-    //         .then(result => {
-    //             blobToDataURL(result).then(res2 => {
-    //                 sendResponse({
-    //                     image: (res2)
-    //                 });
-    //             }).catch(err2 => {
-    //                 console.error("Blob to Data error:", err2);
-    //             });
-    //         })
-    //         .catch(error => {
-    //             console.error("BG error:", error);
-    //             sendResponse({ error: error.message });
-    //         });
-
-    //     return true;
-    // }
-
     if (message.type === "GET_SCREENSHOT") {
         (async () => {
             try {
@@ -36,21 +16,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
-    // if (message.type === "SAVE_SCREENSHOT") {
-    //     console.log("[CachableUI DB] Reveived a SAVE request");
-
-    //     const tabId = sender.tab.id;
-    //     captureFullPage(tabId, message.scrollHeight, message.viewportHeight, message.width).then(data => {
-    //         if (data !== null) {
-    //             console.log("saving screenshot for: ", message.id)
-    //             saveScreenshot(data, message.id)
-    //                 .then(() => sendResponse({ success: true }))
-    //                 .catch(error => sendResponse({ error: error.message }));
-    //         }
-    //     });
-
-    //     return true;
-    // }
     if (message.type === "SAVE_SCREENSHOT") {
         const tabId = sender.tab.id;
         console.log(`[CachableUI] Get a SAVE SCREENSHOT request for tab ${tabId}`);
@@ -63,7 +28,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     message.viewportHeight,
                     message.width
                 );
-                //console.log(`data looks like: ${data}`);
 
                 if (data === null) {
                     sendResponse({ error: "No screenshot data" });
@@ -74,6 +38,50 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
                 sendResponse({ success: true });
 
+            } catch (error) {
+                console.log(`error: ${error}`);
+                sendResponse({ error: error.message });
+            }
+        })();
+
+        return true;
+    }
+
+    if (message.type === "GET_FILE") {
+        (async () => {
+            try {
+                const result = await getFile(message.id);
+                const res2 = await blobToDataURL(result);
+
+                sendResponse({ image: res2 });
+
+            } catch (error) {
+                console.error("GET error:", error);
+                sendResponse({ error: error.message });
+            }
+        })();
+
+        return true;
+    }
+
+    if (message.type === "SAVE_FILE" && message.url) {
+        const tabId = sender.tab.id;
+        console.log(`[CachableUI] Get a SAVE FILE request for tab ${tabId}`);
+
+        (async () => {
+            try {
+                const data = await downloadData(message.url);
+                if (data === null) {
+                    sendResponse({ success: false, error: "No file data" });
+                    return;
+                }
+
+                try {
+                    const localurl = await saveFile(data, message.id);
+                    sendResponse({ success: true, localurl: localurl });
+                } catch (e) {
+                    sendResponse({ success: false, localurl: null });
+                }
             } catch (error) {
                 console.log(`error: ${error}`);
                 sendResponse({ error: error.message });
@@ -97,6 +105,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 });
+
+async function downloadData(url) {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    return blob
+}
 
 // Screenshot_save
 
@@ -127,12 +142,15 @@ async function dataURLtoBlob(dataurl) {
 
 function openDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open("ScreenshotsDB", 1);
+        const request = indexedDB.open("CachableUI_DB", 1);
 
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            if (!db.objectStoreNames.contains("images")) {
-                db.createObjectStore("images", { keyPath: "id" });
+            if (!db.objectStoreNames.contains("screenshots")) {
+                db.createObjectStore("screenshots", { keyPath: "id" });
+            }
+            if (!db.objectStoreNames.contains("files")) {
+                db.createObjectStore("files", { keyPath: "id" });
             }
         };
 
@@ -148,17 +166,14 @@ function openDB() {
 
 async function clearObjectStore() {
     const db = await openDB(); // use your openDB() function
-    const transaction = db.transaction("images", "readwrite");
-    const store = transaction.objectStore("images");
+    const transaction = db.transaction("screenshots", "readwrite");
+    const store = transaction.objectStore("screenshots");
 
     return new Promise((resolve, reject) => {
         const request = store.clear();
 
         request.onsuccess = () => {
             console.log("All records cleared from object store");
-            listAllKeys().then(r => {
-                // console.log(r)
-            });
             resolve();
         };
 
@@ -178,9 +193,9 @@ async function saveScreenshot(dataUrl, dataId) {
     console.log("blob: " + blob);
     // console.log("c");
 
-    const transaction = db.transaction("images", "readwrite");
+    const transaction = db.transaction("screenshots", "readwrite");
     // console.log("d");
-    const store = transaction.objectStore("images");
+    const store = transaction.objectStore("screenshots");
     // console.log("e");
 
     const record = {
@@ -197,12 +212,76 @@ async function saveScreenshot(dataUrl, dataId) {
     });
 }
 
+async function hashBlob(blob) {
+    const arrayBuffer = await blob.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
+async function saveFile(blob) {
+    const db = await openDB();
+
+    // const transaction = db.transaction("files", "readwrite");
+    // const store = transaction.objectStore("files");
+
+    const record = {
+        id: "cachableui-file:" + (await hashBlob(blob)),
+        blob: blob
+    };
+
+    // return new Promise((resolve, reject) => {
+    //     const request = store.put(record);
+    //     request.onsuccess = () => {
+    //         resolve(record.id)
+    //         console.log("Success");
+    //     };
+    //     request.onerror = (e) => {
+    //         console.log("Errrr: " + e);
+    //         reject(e)
+    //     };
+    // });
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction("files", "readwrite");
+        const store = transaction.objectStore("files");
+
+        const request = store.put(record);
+
+        request.onsuccess = () => {
+            console.log("Record queued for saving:", record);
+        };
+
+        request.onerror = (e) => {
+            console.error("Error saving record:", e.target.error);
+            reject(e.target.error);
+        };
+
+        // Make sure the transaction actually completes
+        transaction.oncomplete = () => {
+            console.log("Transaction complete");
+            resolve(record.id);
+        };
+
+        transaction.onerror = (e) => {
+            console.error("Transaction failed:", e.target.error);
+            reject(e.target.error);
+        };
+
+        transaction.onabort = (e) => {
+            console.error("Transaction aborted:", e.target.error);
+            reject(e.target.error);
+        };
+    });
+}
+
+
 async function getScreenshot(id) {
-    const keys = await listAllKeys();
 
     const db = await openDB();
-    const transaction = db.transaction("images", "readonly");
-    const store = transaction.objectStore("images");
+    const transaction = db.transaction("screenshots", "readonly");
+    const store = transaction.objectStore("screenshots");
 
     return new Promise((resolve, reject) => {
         const request = store.get(id);
@@ -210,7 +289,26 @@ async function getScreenshot(id) {
             if (request.result) {
                 resolve(request.result.blob);
             } else {
-                reject("No screenshot found for id " + id + " (we only have " + JSON.stringify(keys) + ")");
+                reject("No screenshot found for id " + id);
+            }
+        };
+        request.onerror = (e) => reject(e);
+    });
+}
+
+async function getFile(id) {
+
+    const db = await openDB();
+    const transaction = db.transaction("files", "readonly");
+    const store = transaction.objectStore("files");
+
+    return new Promise((resolve, reject) => {
+        const request = store.get(id);
+        request.onsuccess = () => {
+            if (request.result) {
+                resolve(request.result.blob);
+            } else {
+                reject("No screenshot found for id " + id);
             }
         };
         request.onerror = (e) => reject(e);
@@ -219,33 +317,6 @@ async function getScreenshot(id) {
 
 // Screenshot loading
 
-async function listAllKeys() {
-    const db = await openDB(); // your function to open the DB
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction("images", "readonly");
-        const store = transaction.objectStore("images");
-
-        const request = store.getAllKeys(); // <-- gets all keys
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = (e) => reject(e);
-    });
-}
-
-
-// async function captureFullPage(tabId) {
-//     await chrome.debugger.attach({ tabId }, "1.3");
-//     const screenshot = await chrome.debugger.sendCommand({ tabId }, "Page.captureScreenshot", {
-//         format: "jpeg",
-//         fromSurface: true,
-//         quality: 60,
-//     });
-
-//     // Prepend the header to make it a valid Data URL
-//     const dataUrl = `data:image/jpeg;base64,${screenshot.data}`;
-
-//     const response = await fetch(dataUrl);
-//     return await response.blob();
-// }
 async function captureFullPage(tabId) {
     const tab = await chrome.tabs.get(tabId);
 
@@ -267,7 +338,7 @@ async function captureFullPage(tabId) {
 
         const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
             format: "jpeg",
-            quality: 80
+            quality: 20
         });
 
         images.push({ dataUrl, y: scrollY });

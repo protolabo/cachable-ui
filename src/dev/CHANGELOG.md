@@ -11,3 +11,8 @@ Theory:
 
 - Worked on a pseudocode for toggle element selection
 - Worked on a pseudocode for element modification detection
+
+
+-----
+
+- Remove default style

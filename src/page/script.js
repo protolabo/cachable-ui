@@ -422,7 +422,7 @@ async function remove_multiple_from_storage(elements) {
   });
 }
 
-function add_element_to_storage(element, setname = null) {
+async function add_element_to_storage(element, setname = null) {
   const rect_elem = element.getBoundingClientRect();
 
   const element_signature = element.getAttribute("data-cui-signature");
@@ -431,6 +431,10 @@ function add_element_to_storage(element, setname = null) {
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
   });
+  remove_default_style(element_as_string.node);
+  await download_src_href(element_as_string.node);
+  show_recu(element_as_string.node)
+
   const data_to_save = {
     key: element_key,
     signature: element_signature,
@@ -532,4 +536,67 @@ function add_version_to_storage(element, setname) {
     });
   });
 
+}
+
+function remove_default_style(node_json) {
+  if (node_json.style) {
+    for (const key in node_json.style) {
+      if (node_json.style[key] === "auto") {
+        delete node_json.style[key];
+      }
+    }
+  }
+  if (node_json.childNodes) {
+    for (const child of node_json.childNodes) {
+      remove_default_style(child)
+    }
+  }
+}
+
+async function download_src_href(node_json) {
+  if (node_json.href && node_json.attributes) {
+    const href = node_json.href
+    console.log("HREF: " + href)
+  }
+  if (node_json.src && node_json.attributes) {
+    const src = node_json.src
+    console.log("SRC: " + src)
+    // 1. Download the file
+    // 2. Save it to indexdb
+    // 3. Rename to local file
+    try {
+      const response = await new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: "SAVE_FILE", url: src }, (resp) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(resp);
+          }
+        });
+      });
+
+      if (response?.localurl) {
+        console.log("response?.localurl: " + response?.localurl);
+        node_json.attributes["data-cui-src-override"] = response.localurl;
+      }
+    } catch (err) {
+      console.error("Error saving file:", err);
+    }
+  }
+  if (node_json.childNodes) {
+    for (const child of node_json.childNodes) {
+      await download_src_href(child)
+    }
+  }
+}
+
+function show_recu(node_json) {
+  if (node_json.attributes) {
+    console.log(node_json.attributes["data-cui-src-override"]);
+  }
+  if (node_json.childNodes) {
+    for (const child of node_json.childNodes) {
+      show_recu(child)
+    }
+  }
 }

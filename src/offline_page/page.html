@@ -30,12 +30,12 @@
       backdrop-filter: blur(2px);
       background-color: rgba(0, 0, 0, 0.5);
       position: absolute;
-      isolation: isolate;
-      /* background-color: rgba(0, 0, 0, 0.6) */
+      mask-image: var(--mask);
+      -webkit-mask-image: var(--mask);
     }
 
     .child_container {
-      background: transparent;
+      background: white;
     }
 
     #element_preview {

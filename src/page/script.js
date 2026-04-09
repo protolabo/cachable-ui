@@ -106,6 +106,20 @@ is_selection_active = false;
 
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
+    if (request.action === "getPageInfo") {
+      sendResponse({
+        totalHeight: document.body.scrollHeight,
+        viewportHeight: window.innerHeight,
+        devicePixelRatio: window.devicePixelRatio,
+        width: document.body.scrollWidth
+      });
+    }
+
+    if (request.action === "scrollTo") {
+      window.scrollTo(0, request.y);
+      sendResponse(true);
+    }
+
     if (request.selection_mode === "active") {
       sendResponse({ code: 0 });
       add_selection_popup();

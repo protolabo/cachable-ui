@@ -1,3 +1,4 @@
+const clear_button = document.getElementById("clear_button");
 const params = new URLSearchParams(window.location.search);
 const element = params.get('element');
 const redirect = params.get('redirect');
@@ -8,9 +9,19 @@ if (!url) {
 }
 
 if (redirect === "true") {
-  document.getElementById("desc").textContent = "Vous êtes hors-ligne. Voici les éléments UI sauvé par Cachable UI:";
+  document.getElementById("desc").textContent = "Vous êtes hors-ligne. Voici les éléments UI sauvés par Cachable UI:";
 } else {
-  document.getElementById("desc").textContent = "Voici les éléments UI sauvé par Cachable UI:";
+  document.getElementById("desc").textContent = "Voici les éléments UI sauvés par Cachable UI:";
+}
+
+function downloadDataURL(dataURL, filename = "image.jpg") {
+    // Create a temporary link
+    const a = document.createElement("a");
+    a.href = dataURL;       // directly use the data URL
+    a.download = filename;  // suggested file name
+
+    // Trigger the download
+    a.click();
 }
 
 chrome.storage.local.get([url], (result) => {
@@ -75,11 +86,13 @@ function apply_node(node, json) {
 async function get_bg() {
   // const key = (element !== null) ? element : "blank";
   try {
+    console.log("send a get screenshot request");
     const img = await chrome.runtime.sendMessage({
       type: "GET_SCREENSHOT",
       id: url
     });
     // console.log("ret is: " + JSON.stringify(img));
+    //downloadDataURL(img.image);
     // console.log("img is " + img.image);
     document.getElementById("whole").style.backgroundImage = `url('${img.image}')`;
   } catch (err) {
@@ -230,3 +243,27 @@ function changeKeyOf(oldKey, newKey) {
     });
   });
 }
+
+clear_button.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ type: "CLEAR_ALL" });
+    chrome.storage.local.remove(url, () => {
+        console.log("[CachableUI] All elements removed from cache");
+    });
+});
+
+function downloadBlob(blob, filename = "file.jpg") {
+    // Create a blob URL
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+
+    // Trigger the download
+    a.click();
+
+    // Cleanup the blob URL
+    URL.revokeObjectURL(url);
+}
+

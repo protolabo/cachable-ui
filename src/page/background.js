@@ -1,43 +1,99 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // if (message.type === "GET_SCREENSHOT") {
+    //     console.log("[CachableUI DB] Reveived a GET request");
+    //     getScreenshot(message.id)
+    //         .then(result => {
+    //             blobToDataURL(result).then(res2 => {
+    //                 sendResponse({
+    //                     image: (res2)
+    //                 });
+    //             }).catch(err2 => {
+    //                 console.error("Blob to Data error:", err2);
+    //             });
+    //         })
+    //         .catch(error => {
+    //             console.error("BG error:", error);
+    //             sendResponse({ error: error.message });
+    //         });
+
+    //     return true;
+    // }
+
     if (message.type === "GET_SCREENSHOT") {
-        console.log("[CachableUI DB] Reveived a GET request");
-        getScreenshot(message.id)
-            .then(result => {
-                blobToDataURL(result).then(res2 => {
-                    sendResponse({
-                        image: (res2)
-                    });
-                }).catch(err2 => {
-                    console.error("Blob to Data error:", err2);
-                });
-            })
-            .catch(error => {
-                console.error("BG error:", error);
+        (async () => {
+            try {
+                const result = await getScreenshot(message.id);
+                const res2 = await blobToDataURL(result);
+
+                sendResponse({ image: res2 });
+
+            } catch (error) {
+                console.error("GET error:", error);
                 sendResponse({ error: error.message });
-            });
+            }
+        })();
 
         return true;
     }
 
-    if (message.type === "SAVE_SCREENSHOT") {
-        console.log("[CachableUI DB] Reveived a SAVE request");
+    // if (message.type === "SAVE_SCREENSHOT") {
+    //     console.log("[CachableUI DB] Reveived a SAVE request");
 
+    //     const tabId = sender.tab.id;
+    //     captureFullPage(tabId, message.scrollHeight, message.viewportHeight, message.width).then(data => {
+    //         if (data !== null) {
+    //             console.log("saving screenshot for: ", message.id)
+    //             saveScreenshot(data, message.id)
+    //                 .then(() => sendResponse({ success: true }))
+    //                 .catch(error => sendResponse({ error: error.message }));
+    //         }
+    //     });
+
+    //     return true;
+    // }
+    if (message.type === "SAVE_SCREENSHOT") {
         const tabId = sender.tab.id;
-        captureFullPage(tabId, message.scrollHeight, message.viewportHeight, message.width).then(data => {
-            if (data !== null) {
-                console.log("saving screenshot for: ", message.id)
-                saveScreenshot(data, message.id)
-                    .then(() => sendResponse({ success: true }))
-                    .catch(error => sendResponse({ error: error.message }));
+        console.log(`[CachableUI] Get a SAVE SCREENSHOT request for tab ${tabId}`);
+
+        (async () => {
+            try {
+                const data = await captureFullPage(
+                    tabId,
+                    message.scrollHeight,
+                    message.viewportHeight,
+                    message.width
+                );
+                //console.log(`data looks like: ${data}`);
+
+                if (data === null) {
+                    sendResponse({ error: "No screenshot data" });
+                    return;
+                }
+
+                await saveScreenshot(data, message.id);
+
+                sendResponse({ success: true });
+
+            } catch (error) {
+                console.log(`error: ${error}`);
+                sendResponse({ error: error.message });
             }
-        });
+        })();
 
         return true;
     }
 
     if (message.type === "CLEAR_ALL") {
         console.log("[CachableUI DB] Reveived a CLEAR request");
-        clearObjectStore();
+        (async () => {
+            try {
+                await clearObjectStore();
+                sendResponse({ success: true });
+            } catch (e) {
+                sendResponse({ error: e.message });
+            }
+        })();
+
         return true;
     }
 });
@@ -118,7 +174,8 @@ async function saveScreenshot(dataUrl, dataId) {
     const db = await openDB();
     // console.log("b " + dataUrl);
     // const blob = await dataURLtoBlob(dataUrl);
-    const blob = dataUrl;
+    const blob = await dataUrl;
+    console.log("blob: " + blob);
     // console.log("c");
 
     const transaction = db.transaction("images", "readwrite");
@@ -174,62 +231,92 @@ async function listAllKeys() {
     });
 }
 
+
 // async function captureFullPage(tabId) {
-//     // const screenshot = await chrome.tabs.captureVisibleTab(null, {});
 //     await chrome.debugger.attach({ tabId }, "1.3");
 //     const screenshot = await chrome.debugger.sendCommand({ tabId }, "Page.captureScreenshot", {
 //         format: "jpeg",
 //         fromSurface: true,
 //         quality: 60,
 //     });
-//     return screenshot.data;
+
+//     // Prepend the header to make it a valid Data URL
+//     const dataUrl = `data:image/jpeg;base64,${screenshot.data}`;
+
+//     const response = await fetch(dataUrl);
+//     return await response.blob();
 // }
-
 async function captureFullPage(tabId) {
-    await chrome.debugger.attach({ tabId }, "1.3");
-    const screenshot = await chrome.debugger.sendCommand({ tabId }, "Page.captureScreenshot", {
-        format: "jpeg",
-        fromSurface: true,
-        quality: 60,
-    });
+    const tab = await chrome.tabs.get(tabId);
 
-    // Prepend the header to make it a valid Data URL
-    const dataUrl = `data:image/jpeg;base64,${screenshot.data}`;
+    // Ask content script for page dimensions
+    const pageInfo = await chrome.tabs.sendMessage(tabId, { action: "getPageInfo" });
 
-    const response = await fetch(dataUrl);
-    return await response.blob();
+    const { totalHeight, viewportHeight, devicePixelRatio } = pageInfo;
+
+    let scrollY = 0;
+    const images = [];
+
+    while (scrollY < totalHeight) {
+        await chrome.tabs.sendMessage(tabId, {
+            action: "scrollTo",
+            y: scrollY
+        });
+
+        await new Promise(r => setTimeout(r, 3000)); // wait for render
+
+        const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+            format: "jpeg",
+            quality: 80
+        });
+
+        images.push({ dataUrl, y: scrollY });
+
+        scrollY += viewportHeight;
+    }
+
+    // Stitch images
+    const finalImage = await stitchImages(images, pageInfo);
+
+    return finalImage;
 }
 
-// async function captureFullPage(tabId, scrollHeight, viewportHeight, width) {
-//     const canvas = new OffscreenCanvas(width, scrollHeight);
-//     const ctx = canvas.getContext("2d");
-//     let currentScroll = 0;
+async function stitchImages(images, pageInfo) {
+    const totalHeight = pageInfo.totalHeight;
+    const viewportHeight = pageInfo.viewportHeight;
+    const width = pageInfo.width;
+    const devicePixelRatio = pageInfo.devicePixelRatio;
 
-//     while (currentScroll < scrollHeight) {
-//         // 2. Scroll to the next segment
-//         await chrome.tabs.sendMessage(tabId, { action: "scrollTo", y: currentScroll });
+    // Create an offscreen canvas
+    const canvas = new OffscreenCanvas(width * devicePixelRatio, totalHeight * devicePixelRatio);
+    const ctx = canvas.getContext('2d');
 
-//         // Wait for the browser to finish rendering the scroll (adjust as needed)
-//         await new Promise(resolve => setTimeout(resolve, 300));
+    // Scale for high-DPI displays
+    ctx.scale(devicePixelRatio, devicePixelRatio);
 
-//         // 3. Capture the visible area
-//         const dataUrl = await chrome.tabs.captureVisibleTab(null, { format: "png" });
-//         const blob = await (await fetch(dataUrl)).blob();
-//         const bitmap = await createImageBitmap(blob);
+    for (const imgData of images) {
+        // Convert base64 data URL to ImageBitmap
+        const blob = await (await fetch(imgData.dataUrl)).blob();
+        const bitmap = await createImageBitmap(blob);
 
-//         // 4. Stitch the segment into the canvas
-//         ctx.drawImage(bitmap, 0, currentScroll);
-//         currentScroll += viewportHeight;
-//     }
+        // Draw at the correct vertical offset
+        ctx.drawImage(bitmap, 0, imgData.y);
+    }
 
-//     // 5. Export final full image
-//     const finalBlob = await canvas.convertToBlob();
-//     return new Promise((resolve) => {
-//         const reader = new FileReader();
-//         reader.onloadend = () => resolve(reader.result);
-//         reader.readAsDataURL(finalBlob);
-//     });
-// }
+    // Convert the canvas to a Blob
+    const finalBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 1.0 });
+
+    // // Convert Blob to data URL
+    // const finalDataUrl = await new Promise((resolve) => {
+    //     const reader = new FileReader();
+    //     reader.onloadend = () => resolve(reader.result);
+    //     reader.readAsDataURL(finalBlob);
+    // });
+
+    return finalBlob;
+}
+
+
 
 // Detect no internet
 

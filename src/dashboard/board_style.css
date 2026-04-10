@@ -1,4 +1,305 @@
+* {
+    max-lines: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+body {
+    padding: 8px;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+}
+
 .dual_tile_div {
     display: flex;
     flex-direction: column;
+}
+
+.page_favicon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.page_tile {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    flex-shrink: 0;
+    gap: 8px;
+    align-items: center;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.element_tile {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    flex-shrink: 0;
+    gap: 8px;
+    align-items: center;
+    padding: 4px;
+    box-sizing: border-box;
+    padding-left: 64px;
+}
+
+.element_btns {
+    display: flex;
+    margin-left: auto;
+    gap: 16px;
+}
+
+.element_btn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+.element_title {
+    color: #ffffffdf;
+    font-weight: 600;
+}
+
+.element_mdi_icon {
+    fill: #ffffffb4;
+    transition: fill 0.3s ease;
+    width: 20px;
+    height: 20px;
+}
+
+.element_mdi_icon:hover {
+    fill: #ffffffde;
+}
+
+.version_mdi_icon {
+    fill: #ffffffb4;
+    transition: fill 0.3s ease;
+    width: 16px;
+    height: 16px;
+}
+
+.version_mdi_icon:hover {
+    fill: #ffffffde;
+}
+
+#main_list {
+    width: 100%;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex-shrink: 1;
+}
+
+.tile_btns {
+    display: flex;
+    margin-left: auto;
+    gap: 16px;
+}
+
+.tile_btn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+.button_nothovered {
+    display: none;
+}
+
+.mdi_icon {
+    fill: #ffffffb4;
+    transition: fill 0.3s ease;
+    width: 20px;
+    height: 20px;
+}
+
+.mdi_icon:hover {
+    fill: #ffffffde;
+}
+
+.del_icon:hover {
+    fill: #ffb7b7b4;
+}
+
+.small_tile_btn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+.small_mdi_icon {
+    fill: #7696ffb4;
+    transition: fill 0.3s ease;
+}
+
+.small_mdi_icon:hover {
+    fill: #1b50ffb4;
+}
+
+.page_timestamp {
+    background-color: #ffffff14;
+    border-radius: 100vh;
+    font-weight: bold;
+    padding: 4px 16px;
+    height: 16px;
+    font-size: 12px;
+    margin: 0;
+}
+
+.page_url_div {
+    display: flex;
+    gap: 8px;
+}
+
+.page_title {
+    border-radius: 100vh;
+    font-weight: bold;
+    height: 20px;
+    font-size: 16px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.page_url {
+    color: #ffffff93;
+    border-radius: 100vh;
+    height: 16px;
+    font-size: 12px;
+    margin: 0;
+    max-width: 500px;
+}
+
+.list_sep {
+    width: calc(100% - 8px);
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.102);
+    margin: 8px 4px;
+}
+
+.div_bigbutton {
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgb(255, 69, 69);
+    border-radius: 50vh;
+    border: none;
+}
+
+.version_list {
+    padding: 0;
+    margin: 0;
+    padding-left: 70px;
+}
+
+.version_entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+}
+
+p {
+    margin: 2px 0;
+}
+
+.hide_list {
+    display: none;
+}
+
+.div_param {
+    font-size: 16px;
+}
+
+#div_params {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+/* Source: https://www.w3schools.com/howto/howto_css_switch.asp */
+/* The switch - the box around the slider */
+.editor_switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 21px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #4c3a81;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 13px;
+    width: 13px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #b197fc;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #b197fc;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(13px);
+    -ms-transform: translateX(13px);
+    transform: translateX(13px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 21px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.nowrapp {
+    max-lines: 1;
+    text-overflow:clip;
+    flex-shrink: 0;
+    white-space:initial;
+    text-align: justify;
+    color: #ffffffc9;
+}
+
+.aa {
+    margin: 16px 16px;
 }

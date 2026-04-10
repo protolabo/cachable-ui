@@ -64,6 +64,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "GET_FAVICON") {
+        fetch(message.url)
+            .then(res => res.blob())
+            .then(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => sendResponse(reader.result);
+                reader.readAsDataURL(blob);
+            });
+
+        return true;
+    }
+
     if (message.type === "SAVE_FILE" && message.url) {
         const tabId = sender.tab.id;
         console.log(`[CachableUI] Get a SAVE FILE request for tab ${tabId}`);
@@ -95,7 +107,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("[CachableUI DB] Reveived a CLEAR request");
         (async () => {
             try {
-                await clearObjectStore();
+                await clearFilesStore();
+                await clearScreenshotStore();
                 sendResponse({ success: true });
             } catch (e) {
                 sendResponse({ error: e.message });
@@ -164,10 +177,30 @@ function openDB() {
     });
 }
 
-async function clearObjectStore() {
-    const db = await openDB(); // use your openDB() function
+async function clearScreenshotStore() {
+    const db = await openDB();
     const transaction = db.transaction("screenshots", "readwrite");
     const store = transaction.objectStore("screenshots");
+
+    return new Promise((resolve, reject) => {
+        const request = store.clear();
+
+        request.onsuccess = () => {
+            console.log("All records cleared from object store");
+            resolve();
+        };
+
+        request.onerror = (e) => {
+            console.error("Error clearing object store:", e);
+            reject(e);
+        };
+    });
+}
+
+async function clearFilesStore() {
+    const db = await openDB();
+    const transaction = db.transaction("files", "readwrite");
+    const store = transaction.objectStore("files");
 
     return new Promise((resolve, reject) => {
         const request = store.clear();

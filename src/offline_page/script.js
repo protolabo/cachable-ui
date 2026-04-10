@@ -2,6 +2,7 @@ const clear_button = document.getElementById("clear_button");
 const params = new URLSearchParams(window.location.search);
 const element = params.get('element');
 const redirect = params.get('redirect');
+const version = params.get('version') || null;
 let url = params.get('url');
 
 if (!url) {
@@ -28,7 +29,10 @@ function downloadDataURL(dataURL, filename = "image.jpg") {
 chrome.storage.local.get("elements", (result) => {
   if (result.elements[url]) {
     if (element !== null && result.elements[url][element]) {
-      const content = result.elements[url][element].content.at(-1).json;
+      let content = result.elements[url][element].content.at(-1).json;
+      if (version !== null) {
+        content = result.elements[url][element].content.at(version).json;
+      }
       const top = result.elements[url][element].top;
       const left = result.elements[url][element].left;
 
@@ -123,6 +127,8 @@ window.addEventListener('online', () => {
 
     document.getElementById("icon").classList.add("blinking_img");
     document.getElementById("desc").style.color = "#97fcb2fc";
+    document.getElementById("topbar").style.backgroundColor = "#97fcb2fc";
+    document.getElementById("overlay_body").style.borderColor = "#97fcb2fc";
     document.getElementById("title").style.color = "#97fcb2fc";
     document.getElementById("desc").textContent = "";
     document.getElementById("desc").innerHTML = "<strong>Connexion rétablie</strong>\nChargement...";

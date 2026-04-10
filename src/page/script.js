@@ -383,6 +383,8 @@ window.onclick = async function (event) {
 // IO OPERATIONS
 
 function remove_from_storage(element) {
+  save_page_metadata()
+
   let json_id = element.getAttribute("data-cui-signature");
 
   chrome.storage.local.get("elements", (result) => {
@@ -403,13 +405,15 @@ function remove_from_storage(element) {
 }
 
 async function remove_multiple_from_storage(elements) {
+  save_page_metadata()
+
   if (elements.length === 0) {
     return;
   }
 
-  await chrome.storage.local.get("elements").then((result) => {
-    const elements = result.elements || {};
-    const data = elements[document.URL];
+  await chrome.storage.local.get(null).then((result) => {
+    const data_elements = result.elements || {};
+    const data = data_elements[document.URL];
 
 
     for (const element of elements) {
@@ -419,18 +423,31 @@ async function remove_multiple_from_storage(elements) {
       }
     }
 
-    chrome.storage.local.set({ "elements": elements }, () => {
+    chrome.storage.local.set({ "elements": data_elements }, () => {
       console.log(`[CachableUI] Deleted multiple from storage ${document.URL}`);
     });
   });
 }
 
 async function add_element_to_storage(element, setname = null) {
+  if (element.tagName === "HTML") {
+    sign_one(element);
+    element = document.body
+  }
+
+  if (!element.getAttribute("data-cui-signature")) {
+    await sign_one(element)
+  }
+
+  save_page_metadata()
   const rect_elem = element.getBoundingClientRect();
 
   const element_signature = element.getAttribute("data-cui-signature");
   const element_uuid = element.getAttribute("data-cui-uuid");
-  const element_key = setname ? setname : element_uuid ? element_uuid : element_signature;
+  let element_key = setname ? setname : element_uuid ? element_uuid : element_signature;
+  if (!element_key) {
+    return;
+  }
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
   });
@@ -520,6 +537,7 @@ function children_saved(element) {
 }
 
 function add_version_to_storage(element, setname) {
+  save_page_metadata()
   const now = Date.now();
   const element_as_string = domJSON.toJSON(element, {
     computedStyle: true
@@ -564,11 +582,11 @@ function remove_default_style(node_json) {
 async function download_src_href(node_json) {
   if (node_json.href && node_json.attributes) {
     const href = node_json.href
-    console.log("HREF: " + href)
+    // console.log("HREF: " + href)
   }
   if (node_json.src && node_json.attributes) {
     const src = node_json.src
-    console.log("SRC: " + src)
+    // console.log("SRC: " + src)
     // 1. Download the file
     // 2. Save it to indexdb
     // 3. Rename to local file
@@ -584,7 +602,6 @@ async function download_src_href(node_json) {
       });
 
       if (response?.localurl) {
-        console.log("response?.localurl: " + response?.localurl);
         node_json.attributes["data-cui-src-override"] = response.localurl;
       }
     } catch (err) {
@@ -617,7 +634,7 @@ async function save_page_metadata() {
   // Favicon
   // Last visisted
 
-  const favicon_url = getFaviconUrl() || getDefaultFavicon();
+  const favicon_url = getFaviconUrl();
   let favicon_dataUrl = null;
   if (favicon_url) {
     favicon_dataUrl = await faviconToDataUrl(favicon_url);
@@ -649,28 +666,22 @@ async function save_page_metadata() {
   });
 }
 
-async function faviconToDataUrl(url) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-
-    return await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
-  } catch (e) {
-    console.error('Failed to fetch favicon:', e);
-    return null;
-  }
+function faviconToDataUrl(url) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { type: "GET_FAVICON", url },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
+        }
+      }
+    );
+  });
 }
 
 function getFaviconUrl() {
-  const links = document.querySelectorAll('link[rel*="icon"]');
-  for (const link of links) {
-    if (link.href) return link.href;
-  }
-  return null;
+  let icon = document.querySelector('link[rel*="icon"]')?.href;
+  return icon;
 }
-
-save_page_metadata()

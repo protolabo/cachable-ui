@@ -221,7 +221,7 @@ input:checked+.slider:before {
   display: flex;
   align-items: center;
   justify-content:end;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+  /* box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164); */
   cursor: pointer;
   overflow: hidden;
   position: relative;
@@ -289,7 +289,7 @@ input:checked+.slider:before {
 #clear_button::before {
   position: absolute;
   top: -20px;
-  content: "Vider le cache";
+  content: "Vider l'archive";
   color: white;
   transition-duration: .3s;
   font-size: 2px;
@@ -298,7 +298,7 @@ input:checked+.slider:before {
 #view_button::before {
   position: absolute;
   top: -20px;
-  content: "Voir le cache";
+  content: "Voir l'archive";
   color: white;
   transition-duration: .3s;
   font-size: 2px;

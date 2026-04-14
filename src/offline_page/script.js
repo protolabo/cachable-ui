@@ -45,7 +45,7 @@ chrome.storage.local.get("elements", (result) => {
       document.getElementById("element_preview").style.left = `${left}px`;
       document.getElementById("element_preview").style.top = `${top}px`;
       document.getElementById("element_preview").style.margin = `0`;
-      recu_apply_custom_src(child_container.lastChild);
+      recu_apply_custom_src(document.getElementById("element_preview"));
     } else {
       for (key in result.elements[url]) {
         const content = result.elements[url][key].content.at(-1).json;

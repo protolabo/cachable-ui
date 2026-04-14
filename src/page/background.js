@@ -17,32 +17,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === "SAVE_SCREENSHOT") {
-        const tabId = sender.tab.id;
-        console.log(`[CachableUI] Get a SAVE SCREENSHOT request for tab ${tabId}`);
+        // const tabId = sender.tab.id;
+        // console.log(`[CachableUI] Get a SAVE SCREENSHOT request for tab ${tabId}`);
 
-        (async () => {
-            try {
-                const data = await captureFullPage(
-                    tabId,
-                    message.scrollHeight,
-                    message.viewportHeight,
-                    message.width
-                );
+        // (async () => {
+        //     try {
+        //         const data = await captureFullPage(
+        //             tabId,
+        //             message.scrollHeight,
+        //             message.viewportHeight,
+        //             message.width
+        //         );
 
-                if (data === null) {
-                    sendResponse({ error: "No screenshot data" });
-                    return;
-                }
+        //         if (data === null) {
+        //             sendResponse({ error: "No screenshot data" });
+        //             return;
+        //         }
 
-                await saveScreenshot(data, message.id);
+        //         await saveScreenshot(data, message.id);
 
-                sendResponse({ success: true });
+        //         sendResponse({ success: true });
 
-            } catch (error) {
-                console.log(`error: ${error}`);
-                sendResponse({ error: error.message });
-            }
-        })();
+        //     } catch (error) {
+        //         console.log(`error: ${error}`);
+        //         sendResponse({ error: error.message });
+        //     }
+        // })();
 
         return true;
     }

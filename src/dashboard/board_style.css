@@ -1,6 +1,6 @@
 * {
     max-lines: 1;
-    overflow: hidden;
+    /*  overflow: hidden; */
     text-overflow: ellipsis;
     flex-shrink: 0;
     white-space: nowrap;
@@ -12,6 +12,8 @@ body {
     height: 100vh;
     width: 100vw;
     box-sizing: border-box;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .dual_tile_div {
@@ -192,6 +194,7 @@ body {
     background-color: rgb(255, 69, 69);
     border-radius: 50vh;
     border: none;
+    margin: auto;
 }
 
 .version_list {
@@ -218,13 +221,17 @@ p {
 
 .div_param {
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    overflow: visible;
 }
 
 #div_params {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 16px;
 }
 
 /* Source: https://www.w3schools.com/howto/howto_css_switch.asp */
@@ -293,13 +300,61 @@ input:checked+.slider:before {
 
 .nowrapp {
     max-lines: 1;
-    text-overflow:clip;
+    text-overflow: clip;
     flex-shrink: 0;
-    white-space:initial;
+    white-space: initial;
     text-align: justify;
     color: #ffffffc9;
 }
 
 .aa {
     margin: 16px 16px;
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
+    border-radius: 50%;
+    background: #574393;
+    cursor: pointer;
+    font-weight: bolder;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 125%;
+    /* above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+
+    background: #4c3a81;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.tooltip-container:hover .tooltip {
+    opacity: 1;
+}
+
+.href_src {
+    margin: 0;
+    padding: 2px 8px;
+    background-color: #8258ff37;
+    border-radius: 4px;
 }

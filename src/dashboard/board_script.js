@@ -186,7 +186,7 @@ async function update_pages_list() {
                     show_element_json(el_content[i].json);
                 });
             }
-            document.getElementById(`collapse_element_${value.url}_${data.key}`).addEventListener("click", () => {
+            document.getElementById(`collapse_element_${value.url}_${data.key}`).addEventListener("click", (e) => {
                 let list = document.getElementById(`list_v_${data.key}_${value.url}`);
                 if (list.classList.contains("hide_list")) {
                     list.classList.remove("hide_list");
@@ -200,7 +200,7 @@ async function update_pages_list() {
             })
 
         }
-        document.getElementById(`collapse_page_${value.url}`).addEventListener("click", () => {
+        document.getElementById(`collapse_page_${value.url}`).addEventListener("click", (e) => {
             let list = document.getElementById(`element_list_${value.url}`);
             if (list.classList.contains("hide_list")) {
                 list.classList.remove("hide_list");
@@ -211,6 +211,8 @@ async function update_pages_list() {
                 document.getElementById(`collapse_icon_${value.url}`).classList.add("hide_list");
                 document.getElementById(`list_icon_${value.url}`).classList.remove("hide_list");
             }
+            e.preventDefault();
+            e.stopImmediatePropagation();
         })
         document.getElementById(`tile_${value.url}`).addEventListener("click", () => {
             let list = document.getElementById(`element_list_${value.url}`);
@@ -286,3 +288,42 @@ document.getElementById("button_clear").addEventListener("click", () => {
     })
 
 });
+
+async function update_params() {
+    const storage = await chrome.storage.local.get("params");
+    const params = storage.params || {
+        "versions": true,
+        "src": true,
+        "href": false
+    };
+    document.getElementById("versions_switch").checked = params.versions || false;
+    document.getElementById("src_switch").checked = params.src || false;
+    document.getElementById("href_switch").checked = params.href || false;
+}
+
+update_params()
+
+const rewrite_params = function () {
+    const params = {
+        "versions": document.getElementById("versions_switch").checked,
+        "src": document.getElementById("src_switch").checked,
+        "href": document.getElementById("href_switch").checked
+    };
+    chrome.storage.local.set({ "params": params }, () => {
+        console.log(`[CachableUI] Updated user parameters: ${JSON.stringify(params)}`);
+    });
+}
+document.getElementById("versions_switch").addEventListener("change", rewrite_params);
+document.getElementById("src_switch").addEventListener("change", rewrite_params);
+document.getElementById("href_switch").addEventListener("change", rewrite_params);
+
+async function update_memory() {
+    chrome.runtime.sendMessage(
+        { type: "GET_MEMORY_USAGE" }
+    ).then((response) => {
+        console.log(JSON.stringify(response))
+        document.getElementById("memoire_utilisee").textContent = response.size || "0MB";
+    });
+}
+
+update_memory()

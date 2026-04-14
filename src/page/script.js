@@ -1,3 +1,18 @@
+let user_params = {
+  "versions": true,
+  "src": true,
+  "href": false
+};
+
+async function update_params() {
+  const storage = await chrome.storage.local.get("params");
+  user_params = storage.params || {
+    "versions": true,
+    "src": true,
+    "href": false
+  };
+}
+
 saved_elements_onpage = [];
 saved_elements_onoverlay = [];
 function updatePosition() {
@@ -543,7 +558,7 @@ function add_version_to_storage(element, setname) {
     computedStyle: true
   });
 
-  console.log("adding version to: " + setname);
+  console.log("[CachableUI] Adding version to: " + setname);
   chrome.storage.local.get("elements", (result) => {
     const elements = result.elements || {};
     const data = elements[document.URL];
@@ -552,10 +567,18 @@ function add_version_to_storage(element, setname) {
     if (!data || !(setname in data)) return;
 
     data[setname].signature = element.getAttribute("data-cui-signature");
-    data[setname].content.push({
-      json: element_as_string,
-      date: now
-    });
+    if (user_params.versions) {
+      data[setname].content.push({
+        json: element_as_string,
+        date: now
+      });
+    } else { // No versions: overwrite latest
+      data[setname].content = [push({
+        json: element_as_string,
+        date: now
+      })];
+    }
+
 
     chrome.storage.local.set({ "elements": elements }, () => {
       console.log("Version added (total of: " + data[setname].content.length + " versions)");

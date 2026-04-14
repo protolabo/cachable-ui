@@ -47,6 +47,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return true;
     }
 
+    if (message.type === "GET_MEMORY_USAGE") {
+        (async () => {
+            try {
+            const mem = await getTotalStorageSize();
+            sendResponse({ "size": mem });
+            } catch (e) {
+            sendResponse({ "size": "0MB" });
+            }
+        })();
+        return true;
+    }
+
     if (message.type === "GET_FILE") {
         (async () => {
             try {
@@ -441,3 +453,33 @@ chrome.webNavigation.onErrorOccurred.addListener(async (details) => {
         });
     }
 });
+
+async function getTotalStorageSize() {
+    const localBytes = await new Promise((resolve) => {
+        chrome.storage.local.getBytesInUse(null, (bytes) => {
+            resolve(bytes || 0);
+        });
+    });
+    let indexedDBBytes = 0;
+
+    if (navigator.storage && navigator.storage.estimate) {
+        const estimate = await navigator.storage.estimate();
+        indexedDBBytes = (estimate.usage || 0) - localBytes;
+
+        if (indexedDBBytes < 0) indexedDBBytes = 0;
+    }
+
+    const totalBytes = localBytes + indexedDBBytes;
+
+    return formatBytes(totalBytes);
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return "0 B";
+
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+
+    const value = (bytes / Math.pow(1024, i));
+    return `${value.toFixed(1)} ${sizes[i]}`;
+}

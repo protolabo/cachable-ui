@@ -353,7 +353,7 @@ async function getFile(id) {
             if (request.result) {
                 resolve(request.result.blob);
             } else {
-                reject("No screenshot found for id " + id);
+                reject("No file found for id " + id);
             }
         };
         request.onerror = (e) => reject(e);

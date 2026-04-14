@@ -198,7 +198,12 @@ async function update_pages_list() {
                     document.getElementById(`version_icon_${value.url}_${data.key}`).classList.remove("hide_list");
                 }
             })
-
+            document.getElementById(`erase_element_${value.url}_${data.key}`).addEventListener("click", (e) => {
+                erase_element(value.url, data.key);
+            })
+            document.getElementById(`view_element_${value.url}_${data.key}`).addEventListener("click", (e) => {
+                view_element(value.url, data.key);
+            })
         }
         document.getElementById(`collapse_page_${value.url}`).addEventListener("click", (e) => {
             let list = document.getElementById(`element_list_${value.url}`);
@@ -214,6 +219,16 @@ async function update_pages_list() {
             e.preventDefault();
             e.stopImmediatePropagation();
         })
+        document.getElementById(`erase_page_${value.url}`).addEventListener("click", (e) => {
+            erase_page(value.url);
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        });
+        document.getElementById(`view_page_${value.url}`).addEventListener("click", (e) => {
+            view_page(value.url);
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        });
         document.getElementById(`tile_${value.url}`).addEventListener("click", () => {
             let list = document.getElementById(`element_list_${value.url}`);
             if (list.classList.contains("hide_list")) {
@@ -278,6 +293,48 @@ function view_version(url, element, version) {
     });
 }
 
+function erase_element(url, element) {
+    chrome.storage.local.get("elements", (result) => {
+        if (result.elements[url]) {
+            const new_elements = result.elements || {};
+            const new_data = new_elements[url];
+            if (new_data) {
+                delete new_data[element];
+            }
+            if (Object.keys(new_data).length == 0) {
+                erase_page(url);
+            }
+
+            chrome.storage.local.set({ "elements": new_elements }, () => {
+                console.log('Element removed from cache');
+                update_pages_list();
+            });
+        }
+    });
+}
+
+function erase_page(url) {
+    chrome.storage.local.get("elements", (result) => {
+        const new_elements = result.elements || {};
+        if (new_elements[url]) {
+            delete new_elements[url];
+            chrome.storage.local.set({ "elements": new_elements }, () => {
+                console.log('Page elements removed from cache');
+                update_pages_list();
+            });
+        }
+    });
+    chrome.storage.local.get("pages", (result) => {
+        const new_pages = result.pages || {};
+        if (new_pages[url]) {
+            delete new_pages[url];
+            chrome.storage.local.set({ "pages": new_pages }, () => {
+                console.log('Page metadata removed from cache');
+                update_pages_list();
+            });
+        }
+    });
+}
 
 update_pages_list();
 

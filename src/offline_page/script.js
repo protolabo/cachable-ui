@@ -17,13 +17,13 @@ if (redirect === "true") {
 }
 
 function downloadDataURL(dataURL, filename = "image.jpg") {
-    // Create a temporary link
-    const a = document.createElement("a");
-    a.href = dataURL;       // directly use the data URL
-    a.download = filename;  // suggested file name
+  // Create a temporary link
+  const a = document.createElement("a");
+  a.href = dataURL;       // directly use the data URL
+  a.download = filename;  // suggested file name
 
-    // Trigger the download
-    a.click();
+  // Trigger the download
+  a.click();
 }
 
 chrome.storage.local.get("elements", (result) => {
@@ -46,6 +46,7 @@ chrome.storage.local.get("elements", (result) => {
       document.getElementById("element_preview").style.top = `${top}px`;
       document.getElementById("element_preview").style.margin = `0`;
       recu_apply_custom_src(document.getElementById("element_preview"));
+      recu_apply_custom_href(document.getElementById("element_preview"));
     } else {
       for (key in result.elements[url]) {
         const content = result.elements[url][key].content.at(-1).json;
@@ -64,7 +65,8 @@ chrome.storage.local.get("elements", (result) => {
         child_container.style.left = `${left}px`;
         child_container.style.top = `${top}px`;
         child_container.firstChild.style.margin = "0";
-        recu_apply_custom_src(child_container.lastChild);
+        recu_apply_custom_href(document.getElementById(`element_preview_${key}`));
+        recu_apply_custom_src(document.getElementById(`element_preview_${key}`));
       }
     }
   }
@@ -103,6 +105,36 @@ async function recu_apply_custom_src(node) {
 
     if (dataUrl) {
       node.src = dataUrl;
+    }
+  }
+}
+
+async function recu_apply_custom_href(node) {
+  console.log("coucou");
+  if (node.childNodes) {
+    for (const child of node.childNodes) {
+      recu_apply_custom_href(child);
+    }
+  }
+
+  if (node.nodeType !== 1) {
+    return
+  }
+
+  if (node.getAttribute("data-cui-href-override")) {
+    const dataUrl = (await chrome.runtime.sendMessage({
+      type: "GET_FILE",
+      id: node.getAttribute("data-cui-href-override")
+    })).image;
+    if (dataUrl) {
+      if (node.tagName === "link") {
+        node.href = dataUrl;
+      } else {
+        node.addEventListener("click", (e) => {
+          e.preventDefault();
+          openDataURL(dataUrl);
+        })
+      }
     }
   }
 }
@@ -288,18 +320,31 @@ clear_button.addEventListener('click', () => {
 });
 
 function downloadBlob(blob, filename = "file.jpg") {
-    // Create a blob URL
-    const url = URL.createObjectURL(blob);
+  // Create a blob URL
+  const url = URL.createObjectURL(blob);
 
-    // Create a temporary link
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
+  // Create a temporary link
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
 
-    // Trigger the download
-    a.click();
+  // Trigger the download
+  a.click();
 
-    // Cleanup the blob URL
-    URL.revokeObjectURL(url);
+  // Cleanup the blob URL
+  URL.revokeObjectURL(url);
 }
 
+function openDataURL(dataURL) {
+  const parts = dataURL.split(',');
+  const byteString = atob(parts[1]);
+  const mimeType = parts[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+}

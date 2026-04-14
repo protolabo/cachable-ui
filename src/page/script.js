@@ -4,14 +4,15 @@ let user_params = {
   "href": false
 };
 
-async function update_params() {
+async function update_params(user_params) {
   const storage = await chrome.storage.local.get("params");
-  user_params = storage.params || {
-    "versions": true,
-    "src": true,
-    "href": false
-  };
+  user_params.versions = storage.params.versions || false;
+  user_params.src = storage.params.src || false;
+  user_params.href = storage.params.href || false;
 }
+update_params(user_params).then(() => {
+  console.log(JSON.stringify(user_params));
+});
 
 saved_elements_onpage = [];
 saved_elements_onoverlay = [];
@@ -191,6 +192,8 @@ function add_box_to_overlay(element, type) {
     box_class = "box_saved";
   } else if (type == "hovered") {
     box_class = "box_hovered";
+  } else if (type == "loading") {
+    box_class = "box_loading";
   }
   box = document.createElement("div");
   if (type === "saved") {
@@ -207,6 +210,10 @@ function add_box_to_overlay(element, type) {
     <span class="label_saved">${displayed_key}</span>
     <svg class="svg_saved" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-242.7c0-17-6.7-33.3-18.7-45.3L352 50.7C340 38.7 323.7 32 306.7 32L64 32zm32 96c0-17.7 14.3-32 32-32l160 0c17.7 0 32 14.3 32 32l0 64c0 17.7-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32l0-64zM224 288a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
     `;
+  } else if (type === "loading") {
+    box.innerHTML = `
+    <svg class="svg_loading" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm0 416a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM48 208a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm368 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM75 369.1A48 48 0 1 1 142.9 437 48 48 0 1 1 75 369.1zM75 75A48 48 0 1 1 142.9 142.9 48 48 0 1 1 75 75zM437 369.1A48 48 0 1 1 369.1 437 48 48 0 1 1 437 369.1z"/></svg>
+    `;
   }
   box.classList.add(box_class);
 
@@ -218,6 +225,7 @@ function add_box_to_overlay(element, type) {
   box.style.position = "fixed";
   box.setAttribute("data-cui-signature", element.getAttribute("data-cui-signature"));
   box.setAttribute("data-cui-overlaytype", type);
+  element.setAttribute("data-cui-overlaytype", type);
 
   document.getElementById("i_cachableui_overlay_second").appendChild(box);
 
@@ -274,23 +282,17 @@ function add_selection_popup() {
   overlay_content.appendChild(overlay_btn);
   overlay.appendChild(overlay_content);
 
-  // document.body.insertBefore(overlay_second, document.body.firstChild);
   const ext_root = document.createElement("div");
   ext_root.id = "i_cachableui_root";
   ext_root.classList.add("cachableui_root");
   document.documentElement.appendChild(ext_root);
-  // const shadow_root = ext_root.attachShadow({ mode: "open" });
-  // shadow_root.appendChild(overlay);
   ext_root.appendChild(overlay);
   ext_root.appendChild(overlay_second);
 
   const root_style = document.createElement("style");
   root_style.innerHTML = `
-  * {
-    font-family: sans-serif;
-  }
-
   .cachableui_overlay {
+      font-family: sans-serif;
   width: 100%;
   height: 100%;
   pointer-events: none;
@@ -304,6 +306,7 @@ function add_selection_popup() {
 }
 
 .cachableui_overlay_content {
+      font-family: sans-serif;
   color: white;
   background-color: #8666e4;
   z-index: 1000;
@@ -317,9 +320,11 @@ function add_selection_popup() {
   justify-content: center;
   padding: 8px;
   box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
+  z-index: 1004;
 }
 
 .cachableui_overlay_second {
+      font-family: sans-serif;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -327,21 +332,25 @@ function add_selection_popup() {
   left: 0;
   pointer-events: none;
   transform: translateY(4px);
+  z-index: 1004;
 }
 
 .cachableui_overlay_button {
+      font-family: sans-serif;
   background-color: transparent;
   border: none;
   padding: 0px;
   transform: translateY(2px);
+  z-index: 1004;
 }
 
 .cachableui_overlay_text {
+      font-family: sans-serif;
   padding: 0px;
   transform: translateY(2px);
+  z-index: 1004;
 }
   `;
-  // shadow_root.appendChild(root_style);
   ext_root.appendChild(root_style)
 }
 
@@ -357,11 +366,25 @@ window.onmouseover = function (event) {
     // console.log(event.target);
     const par_element = parents_saved(event.target);
 
-    document.getElementById("i_cachableui_overlay_second").replaceChildren();
-    add_box_to_overlay(par_element ? par_element : event.target, "hovered");
-    add_selected_elements(document.body);
+    const tmp_el = par_element ? par_element : event.target;
+    if (tmp_el.getAttribute("data-cui-overlay") !== "saved" && tmp_el.getAttribute("data-cui-overlay") !== "loading") {
+      // document.getElementById("i_cachableui_overlay_second").replaceChildren();
+      removeHoveredBoxesOf(document.getElementById("i_cachableui_overlay_second"))
+      add_box_to_overlay(par_element ? par_element : event.target, "hovered");
+      add_selected_elements(document.body);
+    }
   }
 };
+
+function removeHoveredBoxesOf(overlay) {
+  const children = Array.from(overlay.children);
+
+  children.forEach(child => {
+    if (child.getAttribute("data-cui-overlaytype") === "hovered" || child.getAttribute("data-cui-overlaytype") === "saved") {
+      child.remove();
+    }
+  });
+}
 
 document.addEventListener('mouseleave', () => {
   const overlay = document.getElementById("i_cachableui_overlay_second");
@@ -374,26 +397,32 @@ document.addEventListener('mouseleave', () => {
   }
 })
 
-window.onclick = async function (event) {
+document.addEventListener("click", async function (event) {
   if (is_selection_active && !String(event.target.id).startsWith("i_cachableui_")) {
     event.preventDefault();
+    event.stopImmediatePropagation();
+    event.stopPropagation();
 
     const par_element = parents_saved(event.target);
     const chld_elements = children_saved(event.target);
     if (par_element === null) {
       // Adding a parent remove all children from storage
-      await remove_multiple_from_storage(chld_elements);
+      if (chld_elements) {
+        await remove_multiple_from_storage(chld_elements);
+      }
 
       remove_box_from_overlay(event.target);
       add_element_to_storage(event.target);
+      add_box_to_overlay(event.target, "loading");
       // add_box_to_overlay(event.target, "saved");
     } else {
       remove_from_storage(par_element);
+      add_box_to_overlay(par_element, "loading");
     }
     return false;
   }
   return false;
-};
+}, true);
 
 // IO OPERATIONS
 
@@ -517,7 +546,6 @@ async function add_element_to_storage(element, setname = null) {
 
 chrome.storage.onChanged.addListener(
   async () => {
-    const old_keymap = structuredClone(keymap);
     await update_storage_keymap();
     document.getElementById("i_cachableui_overlay_second")?.replaceChildren();
     add_selected_elements(document.body);
@@ -604,31 +632,47 @@ function remove_default_style(node_json) {
 
 async function download_src_href(node_json) {
   if (node_json.href && node_json.attributes) {
-    const href = node_json.href
-    // console.log("HREF: " + href)
+    if (user_params.href) {
+      const href = node_json.href
+      try {
+        const response = await new Promise((resolve, reject) => {
+          chrome.runtime.sendMessage({ type: "SAVE_FILE", url: href }, (resp) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve(resp);
+            }
+          });
+        });
+
+        if (response?.localurl) {
+          node_json.attributes["data-cui-href-override"] = response.localurl;
+        }
+      } catch (err) {
+        console.error("Error saving file:", err);
+      }
+    }
   }
   if (node_json.src && node_json.attributes) {
-    const src = node_json.src
-    // console.log("SRC: " + src)
-    // 1. Download the file
-    // 2. Save it to indexdb
-    // 3. Rename to local file
-    try {
-      const response = await new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ type: "SAVE_FILE", url: src }, (resp) => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve(resp);
-          }
+    if (user_params.src) {
+      const src = node_json.src
+      try {
+        const response = await new Promise((resolve, reject) => {
+          chrome.runtime.sendMessage({ type: "SAVE_FILE", url: src }, (resp) => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve(resp);
+            }
+          });
         });
-      });
 
-      if (response?.localurl) {
-        node_json.attributes["data-cui-src-override"] = response.localurl;
+        if (response?.localurl) {
+          node_json.attributes["data-cui-src-override"] = response.localurl;
+        }
+      } catch (err) {
+        console.error("Error saving file:", err);
       }
-    } catch (err) {
-      console.error("Error saving file:", err);
     }
   }
   if (node_json.childNodes) {

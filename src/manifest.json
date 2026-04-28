@@ -1,7 +1,7 @@
 {
   "name": "Cachable UI",
   "description": "Gestion de cache avancée",
-  "version": "1.3",
+  "version": "2.0",
   "permissions": [
     "activeTab",
     "scripting",
